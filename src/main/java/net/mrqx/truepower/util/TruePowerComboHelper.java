@@ -1,0 +1,62 @@
+package net.mrqx.truepower.util;
+
+import mods.flammpfeil.slashblade.item.ItemSlashBlade;
+import mods.flammpfeil.slashblade.registry.combo.ComboState;
+import mods.flammpfeil.slashblade.slasharts.SlashArts;
+import mods.flammpfeil.slashblade.util.AdvancementHelper;
+import mods.flammpfeil.slashblade.util.AttackManager;
+import mods.flammpfeil.slashblade.util.KnockBacks;
+import mods.flammpfeil.slashblade.util.TimeValueHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+
+import java.util.function.Consumer;
+
+public class TruePowerComboHelper {
+    public static final ComboState.TimeLineTickAction UPPER_SLASH = ComboState.TimeLineTickAction.getBuilder()
+            .put((int) TimeValueHelper.getTicksFromFrames(7.0F), (entityIn) -> AttackManager.doSlash(entityIn, -80.0F, Vec3.ZERO, false, false, 0.9, KnockBacks.toss))
+            .build();
+
+    public static final ComboState.TimeLineTickAction POWERED_UPPER_SLASH = ComboState.TimeLineTickAction.getBuilder()
+            .put((int) TimeValueHelper.getTicksFromFrames(7.0F), (entityIn) -> AttackManager.doSlash(entityIn, -80.0F, Vec3.ZERO, false, false, 0.25, KnockBacks.toss))
+            .put((int) TimeValueHelper.getTicksFromFrames(9.0F), (entityIn) -> AttackManager.doSlash(entityIn, -80.0F, Vec3.ZERO, false, false, 1.35, KnockBacks.toss))
+            .build();
+
+    public static SlashArts.ArtsType releaseActionQuickCharge(LivingEntity user, Integer elapsed, Integer startFrame) {
+        int level = user.getMainHandItem().getEnchantmentLevel(Enchantments.SOUL_SPEED);
+        if (elapsed > startFrame && elapsed <= 3 + level + startFrame) {
+            AdvancementHelper.grantedIf(Enchantments.SOUL_SPEED, user);
+            AdvancementHelper.grantCriterion(user, AdvancementHelper.ADVANCEMENT_QUICK_CHARGE);
+            return SlashArts.ArtsType.Jackpot;
+        } else {
+            return SlashArts.ArtsType.Fail;
+        }
+    }
+
+    public static SlashArts.ArtsType releaseActionQuickCharge(LivingEntity user, Integer elapsed, Integer startFrame, Integer endFrame) {
+        int level = user.getMainHandItem().getEnchantmentLevel(Enchantments.SOUL_SPEED);
+        if (elapsed > startFrame && elapsed < endFrame + level) {
+            AdvancementHelper.grantedIf(Enchantments.SOUL_SPEED, user);
+            AdvancementHelper.grantCriterion(user, AdvancementHelper.ADVANCEMENT_QUICK_CHARGE);
+            return SlashArts.ArtsType.Jackpot;
+        } else {
+            return SlashArts.ArtsType.Fail;
+        }
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static Consumer<ResourceLocation> setClientCombo() {
+        return (comboSeq) -> {
+            Player player = Minecraft.getInstance().player;
+            if (player != null) {
+                player.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> state.updateComboSeq(player, comboSeq));
+            }
+        };
+    }
+}

@@ -1,0 +1,24 @@
+{
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "mixins": [
+    "MixinAdvancementHelper",
+    "MixinAttackManager",
+    "MixinComboCommands",
+    "MixinComboStateRegistry",
+    "MixinConcentrationRanks",
+    "MixinItemSlashBlade",
+    "MixinJudgementCut",
+    "MixinPlayer",
+    "MixinRankPointHandler",
+    "MixinSlashArts",
+    "MixinSlayerStyleArts",
+    "MixinSummonedSwordArts"
+  ],
+  "package": "net.mrqx.truepower.mixin",
+  "required": true,
+  "client": [
+    "MixinLocalPlayer",
+    "MixinLockOnManager"
+  ]
+}
