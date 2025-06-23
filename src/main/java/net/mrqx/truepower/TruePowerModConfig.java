@@ -51,7 +51,7 @@ public class TruePowerModConfig {
                 .push("Combo settings");
 
         CAN_NOT_MOVE_WHILE_COMBO = commonBuilder
-                .comment("Can`t move while using some combo. (default: true)")
+                .comment("Can't move while using some combo. (default: true)")
                 .define("can_not_move_while_combo", true);
 
         COMBO_TIMEOUT_FOR_RANK_INCREASE = commonBuilder
@@ -67,11 +67,11 @@ public class TruePowerModConfig {
                 .defineInRange("void_slash_damage", 2.5, 0, Double.MAX_VALUE);
 
         POWERED_VOID_SLASH_DAMAGE_FIRST = commonBuilder
-                .comment("Set the first hit`s damage of Void Slash while player is powered.(NOT the SA Void Slash!) (default: 2.8)")
+                .comment("Set the first hit's damage of Void Slash while player is powered.(NOT the SA Void Slash!) (default: 2.8)")
                 .defineInRange("powered_void_slash_damage_first", 2.8, 0, Double.MAX_VALUE);
 
         POWERED_VOID_SLASH_DAMAGE_SECOND = commonBuilder
-                .comment("Set the second hit`s damage of Void Slash while player is powered.(NOT the SA Void Slash!) (default: 1.2)")
+                .comment("Set the second hit's damage of Void Slash while player is powered.(NOT the SA Void Slash!) (default: 1.2)")
                 .defineInRange("powered_void_slash_damage_second", 1.2, 0, Double.MAX_VALUE);
 
         JUDGEMENT_CUT_EXTRA_TARGET = commonBuilder
