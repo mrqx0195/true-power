@@ -23,7 +23,7 @@ public class MovementEventHandler {
         player.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
             CompoundTag persistentData = player.getPersistentData();
             Input input = event.getInput();
-            if (state.getComboSeq().equals(ComboStateRegistry.NONE.getId())) {
+            if (!persistentData.getBoolean("truePower.no_move_enable") || state.getComboSeq().equals(ComboStateRegistry.NONE.getId())) {
                 return;
             }
             if (state.getComboSeq().equals(new ResourceLocation(persistentData.getString("truePower.combo")))) {

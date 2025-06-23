@@ -157,9 +157,7 @@ public class ComboModifyHandler {
         } else if (combo.getStartFrame() == 0
                 && combo.getEndFrame() == 1
                 && combo.getPriority() == 1000) {
-            builder.addTickAction(livingEntity -> {
-                RankManager.setPreAddRank(livingEntity, 0);
-            });
+            builder.addTickAction(livingEntity -> RankManager.setPreAddRank(livingEntity, 0));
         }
 
 
@@ -183,16 +181,11 @@ public class ComboModifyHandler {
                     livingEntity.getPersistentData().putString("truePower.combo", state.getComboSeq().toString());
 
                     long elapsedTime = state.getElapsedTime(livingEntity);
-                    if (TruePowerModConfig.CAN_NOT_MOVE_WHILE_COMBO.get()) {
-                        livingEntity.getPersistentData().putBoolean("truePower.canMove",
-                                (modifier.canCancelFrame != -1) && (elapsedTime >= modifier.canCancelFrame));
+                    livingEntity.getPersistentData().putBoolean("truePower.canMove",
+                            (modifier.canCancelFrame != -1) && (elapsedTime >= modifier.canCancelFrame));
 
-                        livingEntity.getPersistentData().putBoolean("truePower.jumpCancelOnly", modifier.jumpCancelOnly);
-                    } else {
-                        livingEntity.getPersistentData().putBoolean("truePower.canMove", true);
-
-                        livingEntity.getPersistentData().putBoolean("truePower.jumpCancelOnly", false);
-                    }
+                    livingEntity.getPersistentData().putBoolean("truePower.jumpCancelOnly", modifier.jumpCancelOnly);
+                    livingEntity.getPersistentData().putBoolean("truePower.no_move_enable", TruePowerModConfig.CAN_NOT_MOVE_WHILE_COMBO.get());
                 }));
 
                 if (modifier.equals(ComboMovementModifiers.COMBO_A3_END2)) {
@@ -271,6 +264,8 @@ public class ComboModifyHandler {
                 livingEntity.getPersistentData().putBoolean("truePower.canMove", true);
 
                 livingEntity.getPersistentData().putBoolean("truePower.jumpCancelOnly", false);
+
+                livingEntity.getPersistentData().putBoolean("truePower.no_move_enable", TruePowerModConfig.CAN_NOT_MOVE_WHILE_COMBO.get());
             }));
         }
 

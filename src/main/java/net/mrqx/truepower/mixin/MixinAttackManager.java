@@ -1,7 +1,6 @@
 package net.mrqx.truepower.mixin;
 
 import mods.flammpfeil.slashblade.capability.concentrationrank.CapabilityConcentrationRank;
-import mods.flammpfeil.slashblade.entity.EntityAbstractSummonedSword;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import mods.flammpfeil.slashblade.util.AttackManager;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,7 +19,7 @@ public abstract class MixinAttackManager {
     private static void playQuickSheathSoundAction(LivingEntity entity, CallbackInfo ci) {
         entity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
             List<EntityBlastSummonedSword> preBlastSwordList = EntityBlastSummonedSword.getPreBlastSwordList(entity);
-            preBlastSwordList.forEach(EntityAbstractSummonedSword::burst);
+            preBlastSwordList.forEach(EntityBlastSummonedSword::burst);
             preBlastSwordList.clear();
             if (!entity.level().isClientSide()) {
                 entity.getCapability(CapabilityConcentrationRank.RANK_POINT).ifPresent(rank -> {

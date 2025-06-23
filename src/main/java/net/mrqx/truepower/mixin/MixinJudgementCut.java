@@ -26,7 +26,7 @@ import java.util.Optional;
 @Mixin(JudgementCut.class)
 public abstract class MixinJudgementCut {
     @Inject(method = "doJudgementCut(Lnet/minecraft/world/entity/LivingEntity;)Lmods/flammpfeil/slashblade/entity/EntityJudgementCut;", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD)
-    private static void inj(LivingEntity user, CallbackInfoReturnable<EntityJudgementCut> cir, Level worldIn, Vec3 eyePos, double airReach, double entityReach, ItemStack stack, Optional<Vec3> resultPos, Vec3 pos, EntityJudgementCut jc) {
+    private static void injectDoJudgementCut(LivingEntity user, CallbackInfoReturnable<EntityJudgementCut> cir, Level worldIn, Vec3 eyePos, double airReach, double entityReach, ItemStack stack, Optional<Vec3> resultPos, Vec3 pos, EntityJudgementCut jc) {
         List<LivingEntity> entities = new java.util.ArrayList<>(user.level()
                 .getNearbyEntities(LivingEntity.class, TargetSelector.lockon, user, user.getBoundingBox().inflate(12.0F, 6.0F, 12.0F))
                 .stream().filter(livingEntity -> !livingEntity.position().add(0, livingEntity.getEyeHeight(), 0).equals(pos) && !livingEntity.position().add(0, livingEntity.getEyeHeight() / 2, 0).equals(pos))
