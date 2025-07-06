@@ -18,6 +18,13 @@ public class JustSlashArtManager {
         return JUST_COUNTER.get(livingEntity.getUUID());
     }
 
+    public static int getJustCount(LivingEntity livingEntity) {
+        if (!JUST_COUNTER.containsKey(livingEntity.getUUID())) {
+            JUST_COUNTER.put(livingEntity.getUUID(), 0);
+        }
+        return JUST_COUNTER.get(livingEntity.getUUID());
+    }
+
     public static void resetJustCount(LivingEntity livingEntity) {
         JUST_COUNTER.put(livingEntity.getUUID(), 0);
     }

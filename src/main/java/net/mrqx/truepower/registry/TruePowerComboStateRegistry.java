@@ -2,8 +2,8 @@ package net.mrqx.truepower.registry;
 
 import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.ability.StunManager;
-import mods.flammpfeil.slashblade.event.FallHandler;
 import mods.flammpfeil.slashblade.event.client.UserPoseOverrider;
+import mods.flammpfeil.slashblade.event.handler.FallHandler;
 import mods.flammpfeil.slashblade.registry.combo.ComboState;
 import mods.flammpfeil.slashblade.util.AttackManager;
 import net.minecraftforge.registries.DeferredRegister;

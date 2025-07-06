@@ -45,9 +45,7 @@ public class AttackEventHandler {
     @SubscribeEvent
     public static void onLivingDeathEvent(LivingDeathEvent event) {
         if (event.getSource().getEntity() instanceof LivingEntity livingEntity) {
-            livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
-                RankManager.setPreAddRank(livingEntity, RankManager.getPreAddRank(livingEntity) + TruePowerModConfig.RANK_INCREASE_FOR_KILL.get());
-            });
+            livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> RankManager.setPreAddRank(livingEntity, RankManager.getPreAddRank(livingEntity) + TruePowerModConfig.RANK_INCREASE_FOR_KILL.get()));
         }
     }
 }

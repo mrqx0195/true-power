@@ -6,6 +6,7 @@ import net.minecraft.client.player.Input;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.MovementInputUpdateEvent;
@@ -20,6 +21,9 @@ public class MovementEventHandler {
     @SubscribeEvent
     public static void onMovementInputUpdateEvent(MovementInputUpdateEvent event) {
         Player player = event.getEntity();
+        if (player.getMainHandItem().is(Items.AIR)) {
+            return;
+        }
         player.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
             CompoundTag persistentData = player.getPersistentData();
             Input input = event.getInput();

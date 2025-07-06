@@ -1,7 +1,7 @@
 package net.mrqx.truepower.mixin;
 
 import mods.flammpfeil.slashblade.ability.SlayerStyleArts;
-import mods.flammpfeil.slashblade.event.InputCommandEvent;
+import mods.flammpfeil.slashblade.event.handler.InputCommandEvent;
 import mods.flammpfeil.slashblade.util.InputCommand;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -29,7 +29,7 @@ public abstract class MixinSlayerStyleArts {
     }
 
     @Redirect(
-            method = "onInputChange(Lmods/flammpfeil/slashblade/event/InputCommandEvent;)V",
+            method = "onInputChange(Lmods/flammpfeil/slashblade/event/handler/InputCommandEvent;)V",
             at = @At(value = "INVOKE", target = "Ljava/util/EnumSet;containsAll(Ljava/util/Collection;)Z"),
             slice = @Slice(
                     from = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;onGround()Z"),
@@ -41,7 +41,7 @@ public abstract class MixinSlayerStyleArts {
     }
 
     @Redirect(
-            method = "onInputChange(Lmods/flammpfeil/slashblade/event/InputCommandEvent;)V",
+            method = "onInputChange(Lmods/flammpfeil/slashblade/event/handler/InputCommandEvent;)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;onGround()Z", ordinal = 2)
     )
     private boolean redirectTrickDodge(ServerPlayer instance) {
@@ -49,7 +49,7 @@ public abstract class MixinSlayerStyleArts {
     }
 
     @Inject(
-            method = "onInputChange(Lmods/flammpfeil/slashblade/event/InputCommandEvent;)V",
+            method = "onInputChange(Lmods/flammpfeil/slashblade/event/handler/InputCommandEvent;)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z"),
             cancellable = true
     )

@@ -10,8 +10,6 @@ import net.minecraftforge.fml.common.Mod;
 public class LivingJumpEventHandler {
     @SubscribeEvent
     public void onPlayerJump(LivingEvent.LivingJumpEvent event) {
-        event.getEntity().getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
-            state.updateComboSeq(event.getEntity(), ComboStateRegistry.NONE.getId());
-        });
+        event.getEntity().getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> state.updateComboSeq(event.getEntity(), ComboStateRegistry.NONE.getId()));
     }
 }

@@ -1,0 +1,45 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "required": false,
+      "id": "slashblade:abstract_summoned_sword"
+    },
+    {
+      "required": false,
+      "id": "slashblade:blade_item_entity"
+    },
+    {
+      "required": false,
+      "id": "slashblade:blade_stand_entity"
+    },
+    {
+      "required": false,
+      "id": "slashblade:blistering_swords"
+    },
+    {
+      "required": false,
+      "id": "slashblade:drive"
+    },
+    {
+      "required": false,
+      "id": "slashblade:heavy_rain_swords"
+    },
+    {
+      "required": false,
+      "id": "slashblade:judgement_cut"
+    },
+    {
+      "required": false,
+      "id": "slashblade:slash_effect"
+    },
+    {
+      "required": false,
+      "id": "slashblade:spiral_swords"
+    },
+    {
+      "required": false,
+      "id": "slashblade:storm_swords"
+    }
+  ]
+}

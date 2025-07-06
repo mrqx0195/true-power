@@ -59,7 +59,7 @@ public class EntityBlastSummonedSword extends EntityAbstractSummonedSword {
                     summonedSword.setPos(pos);
                     summonedSword.setDamage(powerLevel / 5.0);
                     summonedSword.setBurstDamage(powerLevel / 2.0);
-
+                    
                     Vec3 dir = targetPos.subtract(pos).normalize();
                     summonedSword.shoot(dir.x, dir.y, dir.z, 3.0F, 0.0F);
                     summonedSword.setOwner(owner);

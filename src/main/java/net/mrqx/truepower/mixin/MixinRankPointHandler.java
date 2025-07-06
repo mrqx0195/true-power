@@ -1,7 +1,7 @@
 package net.mrqx.truepower.mixin;
 
 import mods.flammpfeil.slashblade.capability.concentrationrank.IConcentrationRank;
-import mods.flammpfeil.slashblade.event.RankPointHandler;
+import mods.flammpfeil.slashblade.event.handler.RankPointHandler;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

@@ -18,8 +18,8 @@ public class MixinSlashArts {
             cancellable = true)
     private void injectDoSlash(SlashArts.ArtsType type, LivingEntity user, CallbackInfoReturnable<ResourceLocation> cir) {
         if (type == SlashArts.ArtsType.Jackpot
-                && (JustSlashArtManager.addJustCount(user) > 3 || JustSlashArtManager.getJustCooldown(user) > 0)
-                && user instanceof ServerPlayer) {
+                && user instanceof ServerPlayer
+                && (JustSlashArtManager.addJustCount(user) > 3 || JustSlashArtManager.getJustCooldown(user) > 0)) {
             JustSlashArtManager.setJustCooldown(user, 3);
             cir.setReturnValue(ComboStateRegistry.NONE.getId());
         }

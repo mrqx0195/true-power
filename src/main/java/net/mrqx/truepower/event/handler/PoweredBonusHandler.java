@@ -4,10 +4,10 @@ import mods.flammpfeil.slashblade.capability.concentrationrank.ConcentrationRank
 import mods.flammpfeil.slashblade.capability.concentrationrank.IConcentrationRank;
 import mods.flammpfeil.slashblade.registry.ModAttributes;
 import mods.flammpfeil.slashblade.util.AttackManager;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -17,18 +17,15 @@ import java.util.UUID;
 @Mod.EventBusSubscriber
 public class PoweredBonusHandler {
     @SubscribeEvent
-    public static void onTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase != TickEvent.Phase.START) {
-            return;
-        }
-        Player player = event.player;
-        boolean isPowered = AttackManager.isPowered(player);
+    public static void onTick(LivingEvent.LivingTickEvent event) {
+        LivingEntity livingEntity = event.getEntity();
+        boolean isPowered = AttackManager.isPowered(livingEntity);
 
         AttributeModifier poweredBonus = new AttributeModifier(
                 UUID.fromString("1340d4b5-b4fa-49a0-ad4e-f55f7dae03fe"),
                 "Powered Bonus", 1.15 - 1, AttributeModifier.Operation.MULTIPLY_TOTAL);
 
-        AttributeInstance attributeInstance = player.getAttribute(ModAttributes.getSlashBladeDamage());
+        AttributeInstance attributeInstance = livingEntity.getAttribute(ModAttributes.getSlashBladeDamage());
         if (attributeInstance == null) {
             return;
         }
@@ -37,15 +34,15 @@ public class PoweredBonusHandler {
             attributeInstance.addPermanentModifier(poweredBonus);
         }
 
-        player.getCapability(ConcentrationRankCapabilityProvider.RANK_POINT).ifPresent(rank -> {
+        livingEntity.getCapability(ConcentrationRankCapabilityProvider.RANK_POINT).ifPresent(rank -> {
             double amount;
-            if (rank.getRank(player.level().getGameTime()).level > IConcentrationRank.ConcentrationRanks.SS.level) {
+            if (rank.getRank(livingEntity.level().getGameTime()).level > IConcentrationRank.ConcentrationRanks.SS.level) {
                 if (isPowered) {
                     amount = 1.4;
                 } else {
                     amount = 1.25;
                 }
-            } else if (rank.getRank(player.level().getGameTime()).level < IConcentrationRank.ConcentrationRanks.C.level) {
+            } else if (rank.getRank(livingEntity.level().getGameTime()).level < IConcentrationRank.ConcentrationRanks.C.level) {
                 if (isPowered) {
                     amount = 0.75;
                 } else {

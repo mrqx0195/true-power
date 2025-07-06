@@ -13,6 +13,7 @@
     "MixinRankPointHandler",
     "MixinSlashArts",
     "MixinSlayerStyleArts",
+    "MixinStunGoal",
     "MixinSummonedSwordArts"
   ],
   "package": "net.mrqx.truepower.mixin",
