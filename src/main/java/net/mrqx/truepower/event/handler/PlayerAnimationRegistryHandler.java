@@ -12,8 +12,8 @@ import net.mrqx.truepower.registry.TruePowerComboStateRegistry;
 
 import java.util.Map;
 
+@Mod.EventBusSubscriber(Dist.CLIENT)
 @OnlyIn(Dist.CLIENT)
-@Mod.EventBusSubscriber
 public class PlayerAnimationRegistryHandler {
     private static final ResourceLocation MOTION_LOCATION = new ResourceLocation("slashblade", "model/pa/player_motion.vmd");
 
