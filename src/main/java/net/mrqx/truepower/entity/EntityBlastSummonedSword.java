@@ -59,7 +59,7 @@ public class EntityBlastSummonedSword extends EntityAbstractSummonedSword {
                     summonedSword.setPos(pos);
                     summonedSword.setDamage(powerLevel / 5.0);
                     summonedSword.setBurstDamage(powerLevel / 2.0);
-                    
+
                     Vec3 dir = targetPos.subtract(pos).normalize();
                     summonedSword.shoot(dir.x, dir.y, dir.z, 3.0F, 0.0F);
                     summonedSword.setOwner(owner);
@@ -99,7 +99,6 @@ public class EntityBlastSummonedSword extends EntityAbstractSummonedSword {
         this.setDamage(this.getBurstDamage());
         list.stream().filter((e) -> e instanceof LivingEntity).map((e) -> (LivingEntity) e).forEach(livingEntity -> {
             StunManager.setStun(livingEntity);
-            this.doForceHitEntity(livingEntity);
             livingEntity.setDeltaMovement(0, livingEntity.getDeltaMovement().y >= 1 ? livingEntity.getDeltaMovement().y + 0.05 : 1, 0);
         });
         super.burst(effects, focusEntity);

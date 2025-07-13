@@ -31,16 +31,20 @@ public class MovementEventHandler {
                 return;
             }
             if (state.getComboSeq().equals(new ResourceLocation(persistentData.getString("truePower.combo")))) {
-                boolean canNotMove = !persistentData.getBoolean("truePower.canMove");
-                boolean jumpCancelOnly = persistentData.getBoolean("truePower.jumpCancelOnly");
-
-                if (canNotMove) {
+                if (!player.onGround()) {
                     input.forwardImpulse = 0;
                     input.leftImpulse = 0;
-                    input.jumping = false;
-                } else if (jumpCancelOnly) {
-                    input.forwardImpulse = 0;
-                    input.leftImpulse = 0;
+                } else {
+                    boolean canNotMove = !persistentData.getBoolean("truePower.canMove");
+                    boolean jumpCancelOnly = persistentData.getBoolean("truePower.jumpCancelOnly");
+                    if (canNotMove) {
+                        input.forwardImpulse = 0;
+                        input.leftImpulse = 0;
+                        input.jumping = false;
+                    } else if (jumpCancelOnly) {
+                        input.forwardImpulse = 0;
+                        input.leftImpulse = 0;
+                    }
                 }
             } else {
                 persistentData.putString("truePower.combo", state.getComboSeq().toString());
