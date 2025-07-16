@@ -6,6 +6,7 @@ import mods.flammpfeil.slashblade.slasharts.SlashArts;
 import mods.flammpfeil.slashblade.util.AdvancementHelper;
 import mods.flammpfeil.slashblade.util.AttackManager;
 import mods.flammpfeil.slashblade.util.KnockBacks;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -13,9 +14,12 @@ import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.PacketDistributor;
 import net.mrqx.sbr_core.events.ComboStateRegistryEvent;
 import net.mrqx.truepower.TruePowerModConfig;
 import net.mrqx.truepower.entity.EntityBlastSummonedSword;
+import net.mrqx.truepower.network.ComboSyncMessage;
+import net.mrqx.truepower.network.NetworkManager;
 import net.mrqx.truepower.util.RankManager;
 import net.mrqx.truepower.util.TruePowerComboHelper;
 
@@ -178,14 +182,29 @@ public class ComboModifyHandler {
                 flag.set(true);
 
                 builder.addTickAction(livingEntity -> livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
-                    livingEntity.getPersistentData().putString("truePower.combo", state.getComboSeq().toString());
+                    if (!livingEntity.level().isClientSide) {
+                        livingEntity.getPersistentData().putString("truePower.combo", state.getComboSeq().toString());
 
-                    long elapsedTime = state.getElapsedTime(livingEntity);
-                    livingEntity.getPersistentData().putBoolean("truePower.canMove",
-                            (modifier.canCancelFrame != -1) && (elapsedTime >= modifier.canCancelFrame));
+                        long elapsedTime = state.getElapsedTime(livingEntity);
+                        livingEntity.getPersistentData().putBoolean("truePower.canMove",
+                                (modifier.canCancelFrame != -1) && (elapsedTime >= modifier.canCancelFrame));
 
-                    livingEntity.getPersistentData().putBoolean("truePower.jumpCancelOnly", modifier.jumpCancelOnly);
-                    livingEntity.getPersistentData().putBoolean("truePower.no_move_enable", TruePowerModConfig.CAN_NOT_MOVE_WHILE_COMBO.get());
+                        livingEntity.getPersistentData().putBoolean("truePower.jumpCancelOnly", modifier.jumpCancelOnly);
+                        livingEntity.getPersistentData().putBoolean("truePower.noMoveEnable", TruePowerModConfig.CAN_NOT_MOVE_WHILE_COMBO.get());
+
+                        if (livingEntity instanceof ServerPlayer serverPlayer) {
+                            CompoundTag persistentData = serverPlayer.getPersistentData();
+                            ComboSyncMessage comboSyncMessage = new ComboSyncMessage();
+
+                            comboSyncMessage.comboState = state.getComboSeq();
+                            comboSyncMessage.canMove = persistentData.getBoolean("truePower.canMove");
+                            comboSyncMessage.jumpCancelOnly = persistentData.getBoolean("truePower.jumpCancelOnly");
+                            comboSyncMessage.noMoveEnable = persistentData.getBoolean("truePower.noMoveEnable");
+                            comboSyncMessage.syncCombo = false;
+
+                            NetworkManager.INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer), comboSyncMessage);
+                        }
+                    }
                 }));
 
                 if (modifier.equals(ComboMovementModifiers.COMBO_A3_END2)) {
@@ -255,17 +274,38 @@ public class ComboModifyHandler {
                             .put(0, (livingEntity) -> step(livingEntity, 1.5))
                             .build());
                 }
+
+                if (modifier.equals(ComboMovementModifiers.AERIAL_RAVE_A1)) {
+                    builder.addTickAction(ComboState.TimeLineTickAction.getBuilder()
+                            .put(0, (livingEntity) -> livingEntity.setDeltaMovement(0, 0, 0))
+                            .build());
+                }
             }
         });
         if (!flag.get()) {
             builder.addTickAction(livingEntity -> livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
-                livingEntity.getPersistentData().putString("truePower.combo", state.getComboSeq().toString());
+                if (!livingEntity.level().isClientSide) {
+                    livingEntity.getPersistentData().putString("truePower.combo", state.getComboSeq().toString());
 
-                livingEntity.getPersistentData().putBoolean("truePower.canMove", true);
+                    livingEntity.getPersistentData().putBoolean("truePower.canMove", true);
 
-                livingEntity.getPersistentData().putBoolean("truePower.jumpCancelOnly", false);
+                    livingEntity.getPersistentData().putBoolean("truePower.jumpCancelOnly", false);
 
-                livingEntity.getPersistentData().putBoolean("truePower.no_move_enable", TruePowerModConfig.CAN_NOT_MOVE_WHILE_COMBO.get());
+                    livingEntity.getPersistentData().putBoolean("truePower.noMoveEnable", TruePowerModConfig.CAN_NOT_MOVE_WHILE_COMBO.get());
+
+                    if (livingEntity instanceof ServerPlayer serverPlayer) {
+                        CompoundTag persistentData = serverPlayer.getPersistentData();
+                        ComboSyncMessage comboSyncMessage = new ComboSyncMessage();
+
+                        comboSyncMessage.comboState = state.getComboSeq();
+                        comboSyncMessage.canMove = persistentData.getBoolean("truePower.canMove");
+                        comboSyncMessage.jumpCancelOnly = persistentData.getBoolean("truePower.jumpCancelOnly");
+                        comboSyncMessage.noMoveEnable = persistentData.getBoolean("truePower.noMoveEnable");
+                        comboSyncMessage.syncCombo = false;
+
+                        NetworkManager.INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer), comboSyncMessage);
+                    }
+                }
             }));
         }
 

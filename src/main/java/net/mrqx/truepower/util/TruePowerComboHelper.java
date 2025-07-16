@@ -8,13 +8,13 @@ import mods.flammpfeil.slashblade.util.AttackManager;
 import mods.flammpfeil.slashblade.util.KnockBacks;
 import mods.flammpfeil.slashblade.util.TimeValueHelper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.mrqx.truepower.network.ComboSyncMessage;
 
 import java.util.function.Consumer;
 
@@ -51,11 +51,16 @@ public class TruePowerComboHelper {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static Consumer<ResourceLocation> setClientCombo() {
-        return (comboSeq) -> {
+    public static Consumer<ComboSyncMessage> setClientCombo() {
+        return (msg) -> {
             Player player = Minecraft.getInstance().player;
             if (player != null) {
-                player.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> state.updateComboSeq(player, comboSeq));
+                if (msg.syncCombo) {
+                    player.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> state.updateComboSeq(player, msg.comboState));
+                }
+                player.getPersistentData().putBoolean("truePower.canMove", msg.canMove);
+                player.getPersistentData().putBoolean("truePower.jumpCancelOnly", msg.jumpCancelOnly);
+                player.getPersistentData().putBoolean("truePower.noMoveEnable", msg.noMoveEnable);
             }
         };
     }
