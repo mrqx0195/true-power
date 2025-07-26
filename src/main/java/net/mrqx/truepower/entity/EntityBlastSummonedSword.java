@@ -76,9 +76,11 @@ public class EntityBlastSummonedSword extends EntityAbstractSummonedSword {
 
 
     private double burstDamage;
+    private boolean hasBurst;
 
     public EntityBlastSummonedSword(EntityType<? extends Projectile> entityTypeIn, Level worldIn) {
         super(entityTypeIn, worldIn);
+        this.hasBurst = false;
     }
 
     public void setBurstDamage(double damageIn) {
@@ -94,6 +96,14 @@ public class EntityBlastSummonedSword extends EntityAbstractSummonedSword {
     }
 
     @Override
+    public void burst() {
+        if (!this.isAlive() || this.hasBurst) {
+            return;
+        }
+        super.burst();
+    }
+
+    @Override
     public void burst(List<MobEffectInstance> effects, @Nullable Entity focusEntity) {
         List<Entity> list = TargetSelector.getTargettableEntitiesWithinAABB(this.level(), 2.0F, this);
         this.setDamage(this.getBurstDamage());
@@ -102,6 +112,7 @@ public class EntityBlastSummonedSword extends EntityAbstractSummonedSword {
             livingEntity.setDeltaMovement(0, livingEntity.getDeltaMovement().y >= 1 ? livingEntity.getDeltaMovement().y + 0.05 : 1, 0);
         });
         super.burst(effects, focusEntity);
+        this.hasBurst = true;
     }
 
     @Override
