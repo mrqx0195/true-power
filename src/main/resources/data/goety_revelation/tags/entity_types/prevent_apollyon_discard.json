@@ -40,6 +40,14 @@
     {
       "required": false,
       "id": "slashblade:storm_swords"
+    },
+    {
+      "required": false,
+      "id": "sbr_core:air_trick_summoned_sword"
+    },
+    {
+      "required": false,
+      "id": "truepower:blast_summoned_sword"
     }
   ]
 }

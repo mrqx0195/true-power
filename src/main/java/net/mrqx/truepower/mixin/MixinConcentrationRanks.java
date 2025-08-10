@@ -21,7 +21,8 @@ public abstract class MixinConcentrationRanks {
     @Final
     public int level;
 
-    private static float MAX_LEVEL = 8F;
+    @Shadow
+    public static float MAX_LEVEL;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void injectInit(String par1, int par2, int level, Range<Float> pointRange, CallbackInfo ci) {
@@ -32,5 +33,10 @@ public abstract class MixinConcentrationRanks {
         } else if (this.level == 7) {
             this.pointRange = Range.atLeast(7.0F);
         }
+    }
+
+    @Inject(method = "<clinit>", at = @At("RETURN"))
+    private static void injectClInit(CallbackInfo ci) {
+        MAX_LEVEL = 8;
     }
 }

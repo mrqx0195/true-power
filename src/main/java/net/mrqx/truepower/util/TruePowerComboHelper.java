@@ -56,8 +56,12 @@ public class TruePowerComboHelper {
             Player player = Minecraft.getInstance().player;
             if (player != null) {
                 if (msg.syncCombo) {
-                    player.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> state.updateComboSeq(player, msg.comboState));
+                    player.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+                        state.setComboSeq(msg.comboState);
+                        state.setLastActionTime(msg.lastActionTime);
+                    });
                 }
+                player.getPersistentData().putString("truePower.combo", msg.comboState.toString());
                 player.getPersistentData().putBoolean("truePower.canMove", msg.canMove);
                 player.getPersistentData().putBoolean("truePower.jumpCancelOnly", msg.jumpCancelOnly);
                 player.getPersistentData().putBoolean("truePower.noMoveEnable", msg.noMoveEnable);

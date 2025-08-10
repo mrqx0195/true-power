@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 
 public class ComboSyncMessage {
     public ResourceLocation comboState;
+    public long lastActionTime;
     public boolean canMove;
     public boolean jumpCancelOnly;
     public boolean noMoveEnable;
@@ -21,6 +22,7 @@ public class ComboSyncMessage {
     public static ComboSyncMessage decode(FriendlyByteBuf buf) {
         ComboSyncMessage msg = new ComboSyncMessage();
         msg.comboState = buf.readResourceLocation();
+        msg.lastActionTime = buf.readLong();
         msg.canMove = buf.readBoolean();
         msg.jumpCancelOnly = buf.readBoolean();
         msg.noMoveEnable = buf.readBoolean();
@@ -30,6 +32,7 @@ public class ComboSyncMessage {
 
     public static void encode(ComboSyncMessage msg, FriendlyByteBuf buf) {
         buf.writeResourceLocation(msg.comboState);
+        buf.writeLong(msg.lastActionTime);
         buf.writeBoolean(msg.canMove);
         buf.writeBoolean(msg.jumpCancelOnly);
         buf.writeBoolean(msg.noMoveEnable);

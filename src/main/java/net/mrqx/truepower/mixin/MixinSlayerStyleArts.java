@@ -5,7 +5,9 @@ import mods.flammpfeil.slashblade.event.handler.InputCommandEvent;
 import mods.flammpfeil.slashblade.util.InputCommand;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -17,6 +19,15 @@ import java.util.EnumSet;
 
 @Mixin(SlayerStyleArts.class)
 public abstract class MixinSlayerStyleArts {
+    @Shadow
+    @Final
+    static EnumSet<InputCommand> move;
+
+    @Inject(method = "<clinit>", at = @At("RETURN"), remap = false)
+    private static void injectClInit(CallbackInfo ci) {
+        move.remove(InputCommand.BACK);
+    }
+
     @Redirect(
             method = "lambda$onInputChange$0",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/nbt/CompoundTag;getInt(Ljava/lang/String;)I", ordinal = 0)

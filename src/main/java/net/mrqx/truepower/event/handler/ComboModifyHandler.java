@@ -71,7 +71,8 @@ public class ComboModifyHandler {
         JUDGEMENT_CUT_SLASH(1923, 1928, 50),
         JUDGEMENT_CUT_SLASH_JUST(1923, 1928, 45),
 
-        VOID_SLASH(2200, 2277, 50, 20, true);
+        VOID_SLASH(2200, 2277, 50, 20, true),
+        TRUE_VOID_SLASH(2200, 2277, 500, 20, true);
 
         public final int startFrame;
         public final int endFrame;
@@ -128,42 +129,11 @@ public class ComboModifyHandler {
         ComboState.Builder builder = event.getBuilder();
         ComboState combo = event.getCombo();
 
-        if ((combo.getStartFrame() == ComboMovementModifiers.RISING_STAR.startFrame
-                && combo.getEndFrame() == ComboMovementModifiers.RISING_STAR.endFrame
-                && combo.getPriority() == ComboMovementModifiers.RISING_STAR.priority
-                && combo.isAerial()) ||
-                (combo.getStartFrame() == ComboMovementModifiers.UPPER_SLASH_JUMP.startFrame
-                        && combo.getEndFrame() == ComboMovementModifiers.UPPER_SLASH_JUMP.endFrame
-                        && combo.getPriority() == ComboMovementModifiers.UPPER_SLASH_JUMP.priority
-                        && combo.isAerial())) {
-            builder.addTickAction((entityIn) -> {
-
-                long elapsed = ComboState.getElapsed(entityIn);
-
-                if (elapsed < 3) {
-                    entityIn.setDeltaMovement(0, entityIn.getDeltaMovement().y * 1.1, 0);
-
-                    if (entityIn instanceof ServerPlayer serverPlayer) {
-                        serverPlayer.connection.send(new ClientboundSetEntityMotionPacket(serverPlayer));
-                    }
-                }
-            });
-        } else if (combo.getStartFrame() == ComboMovementModifiers.AERIAL_RAVE_B3.startFrame
-                && combo.getEndFrame() == ComboMovementModifiers.AERIAL_RAVE_B3.endFrame
-                && combo.getPriority() == ComboMovementModifiers.AERIAL_RAVE_B3.priority
-                && combo.isAerial()) {
-            builder.addTickAction(ComboState.TimeLineTickAction.getBuilder()
-                    .put(6, (entityIn) -> AttackManager.doSlash(entityIn, 180 + 57, Vec3.ZERO, false, false, 0.4, KnockBacks.toss))
-                    .put(7, (entityIn) -> AttackManager.doSlash(entityIn, 180 + 57, Vec3.ZERO, false, false, 0.4, KnockBacks.toss))
-                    .put(8, (entityIn) -> AttackManager.doSlash(entityIn, 180 + 57, Vec3.ZERO, false, false, 0.4, KnockBacks.toss))
-                    .put(9, (entityIn) -> AttackManager.doSlash(entityIn, 180 + 57, Vec3.ZERO, false, false, 0.4, KnockBacks.toss))
-                    .build());
-        } else if (combo.getStartFrame() == 0
+        if (combo.getStartFrame() == 0
                 && combo.getEndFrame() == 1
                 && combo.getPriority() == 1000) {
             builder.addTickAction(livingEntity -> RankManager.setPreAddRank(livingEntity, 0));
         }
-
 
         EnumSet.allOf(RemoveReleaseAction.class).forEach(remover -> {
             if (combo.getStartFrame() == remover.startFrame
@@ -197,6 +167,7 @@ public class ComboModifyHandler {
                             ComboSyncMessage comboSyncMessage = new ComboSyncMessage();
 
                             comboSyncMessage.comboState = state.getComboSeq();
+                            comboSyncMessage.lastActionTime = state.getLastActionTime();
                             comboSyncMessage.canMove = persistentData.getBoolean("truePower.canMove");
                             comboSyncMessage.jumpCancelOnly = persistentData.getBoolean("truePower.jumpCancelOnly");
                             comboSyncMessage.noMoveEnable = persistentData.getBoolean("truePower.noMoveEnable");
@@ -206,6 +177,28 @@ public class ComboModifyHandler {
                         }
                     }
                 }));
+
+                if ((modifier.equals(ComboMovementModifiers.RISING_STAR) || modifier.equals(ComboMovementModifiers.UPPER_SLASH_JUMP)) && combo.isAerial()) {
+                    builder.addTickAction((entityIn) -> {
+
+                        long elapsed = ComboState.getElapsed(entityIn);
+
+                        if (elapsed < 3) {
+                            entityIn.setDeltaMovement(0, entityIn.getDeltaMovement().y * 1.1, 0);
+
+                            if (entityIn instanceof ServerPlayer serverPlayer) {
+                                serverPlayer.connection.send(new ClientboundSetEntityMotionPacket(serverPlayer));
+                            }
+                        }
+                    });
+                } else if (modifier.equals(ComboMovementModifiers.AERIAL_RAVE_B3) && combo.isAerial()) {
+                    builder.addTickAction(ComboState.TimeLineTickAction.getBuilder()
+                            .put(6, (entityIn) -> AttackManager.doSlash(entityIn, 180 + 57, Vec3.ZERO, false, false, 0.4, KnockBacks.toss))
+                            .put(7, (entityIn) -> AttackManager.doSlash(entityIn, 180 + 57, Vec3.ZERO, false, false, 0.4, KnockBacks.toss))
+                            .put(8, (entityIn) -> AttackManager.doSlash(entityIn, 180 + 57, Vec3.ZERO, false, false, 0.4, KnockBacks.toss))
+                            .put(9, (entityIn) -> AttackManager.doSlash(entityIn, 180 + 57, Vec3.ZERO, false, false, 0.4, KnockBacks.toss))
+                            .build());
+                }
 
                 if (modifier.equals(ComboMovementModifiers.COMBO_A3_END2)) {
                     builder.releaseAction(ComboState::releaseActionQuickCharge);
@@ -298,6 +291,7 @@ public class ComboModifyHandler {
                         ComboSyncMessage comboSyncMessage = new ComboSyncMessage();
 
                         comboSyncMessage.comboState = state.getComboSeq();
+                        comboSyncMessage.lastActionTime = state.getLastActionTime();
                         comboSyncMessage.canMove = persistentData.getBoolean("truePower.canMove");
                         comboSyncMessage.jumpCancelOnly = persistentData.getBoolean("truePower.jumpCancelOnly");
                         comboSyncMessage.noMoveEnable = persistentData.getBoolean("truePower.noMoveEnable");
@@ -308,7 +302,6 @@ public class ComboModifyHandler {
                 }
             }));
         }
-
     }
 
     public static void step(LivingEntity livingEntity, double step) {

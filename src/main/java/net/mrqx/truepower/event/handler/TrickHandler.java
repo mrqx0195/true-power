@@ -87,12 +87,10 @@ public class TrickHandler {
             NBTHelper.putVector3d(sender.getPersistentData(), "sb.avoid.vec", sender.position());
 
             JustSlashArtManager.resetJustCount(sender);
-            bladeState.updateComboSeq(sender, ComboStateRegistry.NONE.getId());
 
             AdvancementHelper.grantCriterion(sender, SlayerStyleArts.ADVANCEMENT_TRICK_DODGE);
 
-            sender.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE)
-                    .ifPresent(state -> state.updateComboSeq(sender, state.getComboRoot()));
+            bladeState.updateComboSeq(sender, bladeState.getComboRoot());
         } else {
             Vec3 oldPos = sender.position();
             Vec3 motion = new Vec3(0, -512, 0);
@@ -157,6 +155,8 @@ public class TrickHandler {
         JustSlashArtManager.resetJustCount(sender);
 
         AdvancementHelper.grantCriterion(sender, SlayerStyleArts.ADVANCEMENT_TRICK_UP);
+
+        bladeState.updateComboSeq(sender, ComboStateRegistry.NONE.getId());
 
         sender.playNotifySound(SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.5F, 1.2F);
     }
