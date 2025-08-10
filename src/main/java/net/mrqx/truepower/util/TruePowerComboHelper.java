@@ -1,6 +1,9 @@
 package net.mrqx.truepower.util;
 
+import dev.kosmx.playerAnim.api.layered.AnimationStack;
+import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
+import mods.flammpfeil.slashblade.registry.ComboStateRegistry;
 import mods.flammpfeil.slashblade.registry.combo.ComboState;
 import mods.flammpfeil.slashblade.slasharts.SlashArts;
 import mods.flammpfeil.slashblade.util.AdvancementHelper;
@@ -8,8 +11,8 @@ import mods.flammpfeil.slashblade.util.AttackManager;
 import mods.flammpfeil.slashblade.util.KnockBacks;
 import mods.flammpfeil.slashblade.util.TimeValueHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -53,12 +56,16 @@ public class TruePowerComboHelper {
     @OnlyIn(Dist.CLIENT)
     public static Consumer<ComboSyncMessage> setClientCombo() {
         return (msg) -> {
-            Player player = Minecraft.getInstance().player;
+            LocalPlayer player = Minecraft.getInstance().player;
             if (player != null) {
                 if (msg.syncCombo) {
                     player.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
                         state.setComboSeq(msg.comboState);
                         state.setLastActionTime(msg.lastActionTime);
+                        if (msg.comboState.equals(ComboStateRegistry.NONE.getId()) || msg.comboState.equals(ComboStateRegistry.STANDBY.getId())) {
+                            AnimationStack animationStack = PlayerAnimationAccess.getPlayerAnimLayer(player);
+                            animationStack.removeLayer(0);
+                        }
                     });
                 }
                 player.getPersistentData().putString("truePower.combo", msg.comboState.toString());
