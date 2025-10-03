@@ -63,6 +63,7 @@ public class TruePowerMod {
             event.registerEntityRenderer(BlastSummonedSword, SummonedSwordRenderer::new);
         }
 
+        @SuppressWarnings("SameParameterValue")
         private static String classToString(Class<? extends Entity> entityClass) {
             return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, entityClass.getSimpleName()).replace("entity_", "");
         }

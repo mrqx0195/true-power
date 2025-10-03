@@ -11,49 +11,44 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Collection;
 import java.util.EnumSet;
 
 @Mixin(SlayerStyleArts.class)
 public abstract class MixinSlayerStyleArts {
-    @Shadow
+    @Shadow(remap = false)
     @Final
-    static EnumSet<InputCommand> move;
+    static EnumSet<InputCommand> MOVE_COMMAND;
 
     @Inject(method = "<clinit>", at = @At("RETURN"), remap = false)
     private static void injectClInit(CallbackInfo ci) {
-        move.remove(InputCommand.BACK);
+        MOVE_COMMAND.remove(InputCommand.BACK);
     }
 
     @Redirect(
-            method = "lambda$onInputChange$0",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/nbt/CompoundTag;getInt(Ljava/lang/String;)I", ordinal = 0)
+            method = "lambda$handleForwardSprintSneak$0",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/nbt/CompoundTag;getInt(Ljava/lang/String;)I", ordinal = 0),
+            remap = false
     )
     private int redirectTrickUp(CompoundTag instance, String pKey) {
-        if ("sb.avoid.trickup".equals(pKey)) {
+        if (SlayerStyleArts.AVOID_TRICKUP_PATH.equals(pKey)) {
             return 1;
         }
         return instance.getInt(pKey);
     }
 
     @Redirect(
-            method = "onInputChange(Lmods/flammpfeil/slashblade/event/handler/InputCommandEvent;)V",
-            at = @At(value = "INVOKE", target = "Ljava/util/EnumSet;containsAll(Ljava/util/Collection;)Z"),
-            slice = @Slice(
-                    from = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;onGround()Z"),
-                    to = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;setPos(Lnet/minecraft/world/phys/Vec3;)V")
-            )
+            method = "processInputCommands",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;onGround()Z", ordinal = 0)
     )
-    private boolean redirectTrickDown(EnumSet<InputCommand> instance, Collection<InputCommand> collection) {
-        return false;
+    private boolean redirectTrickDown(ServerPlayer instance) {
+        return true;
     }
 
     @Redirect(
-            method = "onInputChange(Lmods/flammpfeil/slashblade/event/handler/InputCommandEvent;)V",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;onGround()Z", ordinal = 2)
+            method = "processInputCommands",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;onGround()Z", ordinal = 1)
     )
     private boolean redirectTrickDodge(ServerPlayer instance) {
         return instance.getPersistentData().getBoolean("truePower.canMove") && instance.onGround();

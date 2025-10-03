@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(StunGoal.class)
 public abstract class MixinStunGoal extends Goal {
-    @Shadow
+    @Shadow(remap = false)
     @Final
     private PathfinderMob entity;
 
@@ -18,6 +18,7 @@ public abstract class MixinStunGoal extends Goal {
         return false;
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Override
     public void tick() {
         entity.setTarget(null);

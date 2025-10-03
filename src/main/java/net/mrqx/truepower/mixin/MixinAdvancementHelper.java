@@ -19,13 +19,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AdvancementHelper.class)
 public class MixinAdvancementHelper {
-    @Inject(method = "grantCriterion(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/resources/ResourceLocation;)V", at = @At("HEAD"))
+    @Inject(method = "grantCriterion(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/resources/ResourceLocation;)V", at = @At("HEAD"), remap = false)
     private static void injectGrantCriterion(ServerPlayer player, ResourceLocation resourcelocation, CallbackInfo ci) {
         player.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
             if (resourcelocation.equals(SlayerStyleArts.ADVANCEMENT_TRICK_DODGE)
                     || resourcelocation.equals(SlayerStyleArts.ADVANCEMENT_TRICK_DOWN)
                     || resourcelocation.equals(SlayerStyleArts.ADVANCEMENT_AIR_TRICK)) {
-                player.getPersistentData().putInt("sb.avoid.trickup", 2);
+                player.getPersistentData().putInt(SlayerStyleArts.AVOID_TRICKUP_PATH, 2);
 
                 CompoundTag persistentData = player.getPersistentData();
                 ComboSyncMessage comboSyncMessage = new ComboSyncMessage();

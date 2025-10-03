@@ -83,8 +83,8 @@ public class TrickHandler {
 
             sender.getPersistentData().putInt("truepower.avoid.trick", 2);
 
-            sender.getPersistentData().putInt("sb.avoid.counter", 2);
-            NBTHelper.putVector3d(sender.getPersistentData(), "sb.avoid.vec", sender.position());
+            sender.getPersistentData().putInt(SlayerStyleArts.AVOID_COUNTER_PATH, 2);
+            NBTHelper.putVector3d(sender.getPersistentData(), SlayerStyleArts.AVOID_VEC_PATH, sender.position());
 
             JustSlashArtManager.resetJustCount(sender);
 
@@ -103,8 +103,8 @@ public class TrickHandler {
 
                 sender.getPersistentData().putInt("truepower.avoid.trick", 2);
 
-                sender.getPersistentData().putInt("sb.avoid.counter", 2);
-                NBTHelper.putVector3d(sender.getPersistentData(), "sb.avoid.vec", sender.position());
+                sender.getPersistentData().putInt(SlayerStyleArts.AVOID_COUNTER_PATH, 2);
+                NBTHelper.putVector3d(sender.getPersistentData(), SlayerStyleArts.AVOID_VEC_PATH, sender.position());
 
                 JustSlashArtManager.resetJustCount(sender);
                 bladeState.updateComboSeq(sender, ComboStateRegistry.NONE.getId());
@@ -130,7 +130,7 @@ public class TrickHandler {
                 || bladeState.isSealed()
                 || !SwordType.from(blade).contains(SwordType.BEWITCHED)
                 || (persistentData.getInt("truepower.avoid.trick") > 0)
-                || (persistentData.getInt("sb.avoid.trickup") > 0)
+                || (persistentData.getInt(SlayerStyleArts.AVOID_TRICKUP_PATH) > 0)
                 || (!persistentData.getBoolean("truePower.canMove"))) {
             return;
         }
@@ -147,10 +147,10 @@ public class TrickHandler {
         sender.isChangingDimension = true;
         sender.connection.send(new ClientboundSetEntityMotionPacket(sender.getId(), motion.scale(0.75F)));
 
-        persistentData.putInt("sb.avoid.trickup", 2);
+        persistentData.putInt(SlayerStyleArts.AVOID_TRICKUP_PATH, 2);
         sender.setOnGround(false);
-        persistentData.putInt("sb.avoid.counter", 2);
-        NBTHelper.putVector3d(persistentData, "sb.avoid.vec", sender.position());
+        persistentData.putInt(SlayerStyleArts.AVOID_COUNTER_PATH, 2);
+        NBTHelper.putVector3d(persistentData, SlayerStyleArts.AVOID_VEC_PATH, sender.position());
 
         JustSlashArtManager.resetJustCount(sender);
 

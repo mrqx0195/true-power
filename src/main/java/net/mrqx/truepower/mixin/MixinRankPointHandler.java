@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(RankPointHandler.class)
 public class MixinRankPointHandler {
-    @Inject(method = "lambda$onLivingDeathEvent$1", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "lambda$onLivingDeathEvent$1", at = @At("HEAD"), cancellable = true, remap = false)
     private static void inject(LivingHurtEvent event, IConcentrationRank cr, CallbackInfo ci) {
         ci.cancel();
     }

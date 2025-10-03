@@ -21,11 +21,13 @@ import java.util.function.Consumer;
 
 @Mixin(ComboStateRegistry.class)
 public abstract class MixinComboStateRegistry {
+    @SuppressWarnings({"InvalidInjectorMethodSignature", "MixinAnnotationTarget"})
     @ModifyArg(method = "/lambda\\$static\\$(5|27)/", at = @At(value = "INVOKE", target = "Lmods/flammpfeil/slashblade/util/AttackManager;doSlash(Lnet/minecraft/world/entity/LivingEntity;FZZD)Lmods/flammpfeil/slashblade/entity/EntitySlashEffect;"), index = 4)
     private static double modifyComboA1(double comboRatio) {
         return 0.4;
     }
 
+    @SuppressWarnings({"InvalidInjectorMethodSignature", "MixinAnnotationTarget"})
     @ModifyArg(method = "/lambda\\$static\\$(13|3[78])/", at = @At(value = "INVOKE", target = "Lmods/flammpfeil/slashblade/util/AttackManager;doSlash(Lnet/minecraft/world/entity/LivingEntity;FZZD)Lmods/flammpfeil/slashblade/entity/EntitySlashEffect;"), index = 4)
     private static double modifyComboA2(double comboRatio) {
         return 0.5;

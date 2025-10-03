@@ -33,26 +33,4 @@ public class VoidSlashHandler {
         return flag.get();
     }
 
-//    @SubscribeEvent(priority = EventPriority.HIGH)
-//    public static void doVoidSlash(InputCommandEvent event) {
-//        ServerPlayer serverPlayer = event.getEntity();
-//        InputStream inputStream = InputStream.getOrCreateInputStream(serverPlayer);
-//
-//        EnumSet<InputCommand> old = event.getOld();
-//        EnumSet<InputCommand> current = event.getCurrent();
-//
-//        boolean doAttack = (!old.contains(InputCommand.L_DOWN) && current.contains(InputCommand.L_DOWN))
-//                || (!old.contains(InputCommand.R_DOWN) && current.contains(InputCommand.R_DOWN));
-//
-//        serverPlayer.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
-//            if (serverPlayer.onGround()
-//                    && event.getCurrent().contains(InputCommand.SNEAK)
-//                    && doAttack
-//                    && inputStream.checkTimeLineInput(VOID_SLASH_INPUT_TIME_LINE)
-//            ) {
-//                JustSlashArtManager.resetJustCount(serverPlayer);
-//                state.updateComboSeq(serverPlayer, TruePowerComboStateRegistry.VOID_SLASH.getId());
-//            }
-//        });
-//    }
 }

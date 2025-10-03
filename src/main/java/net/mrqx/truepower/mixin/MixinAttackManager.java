@@ -16,7 +16,7 @@ import java.util.List;
 
 @Mixin(AttackManager.class)
 public abstract class MixinAttackManager {
-    @Inject(method = "playQuickSheathSoundAction(Lnet/minecraft/world/entity/LivingEntity;)V", at = @At("HEAD"))
+    @Inject(method = "playQuickSheathSoundAction(Lnet/minecraft/world/entity/LivingEntity;)V", at = @At("HEAD"), remap = false)
     private static void playQuickSheathSoundAction(LivingEntity entity, CallbackInfo ci) {
         if (entity.level().isClientSide) {
             return;

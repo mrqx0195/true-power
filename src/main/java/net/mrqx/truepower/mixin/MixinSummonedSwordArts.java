@@ -13,8 +13,10 @@ public class MixinSummonedSwordArts {
     @Redirect(method = "lambda$onInputChange$0",
             at = @At(
                     value = "INVOKE",
-                    target = "Lmods/flammpfeil/slashblade/event/Scheduler;schedule(Ljava/lang/String;JLnet/minecraft/world/level/timers/TimerCallback;)V"
-            )
+                    target = "Lmods/flammpfeil/slashblade/event/Scheduler;schedule(Ljava/lang/String;JLnet/minecraft/world/level/timers/TimerCallback;)V",
+                    remap = false
+            ),
+            remap = false
     )
     private void redirectSchedule(Scheduler instance, String key, long time, TimerCallback<LivingEntity> callback) {
         if (!"HeavyRainSwords".equals(key)) {

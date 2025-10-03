@@ -13,15 +13,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(IConcentrationRank.ConcentrationRanks.class)
 public abstract class MixinConcentrationRanks {
     @Mutable
-    @Shadow
+    @Shadow(remap = false)
     @Final
     Range<Float> pointRange;
 
-    @Shadow
+    @Shadow(remap = false)
     @Final
     public int level;
 
-    @Shadow
+    @Shadow(remap = false)
     public static float MAX_LEVEL;
 
     @Inject(method = "<init>", at = @At("RETURN"))

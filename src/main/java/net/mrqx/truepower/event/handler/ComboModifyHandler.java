@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ComboModifyHandler {
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "SameParameterValue"})
     private enum ComboMovementModifiers {
         COMBO_A1(1, 10, 100, 2, true),
         COMBO_A1_END(10, 21, 100, 0, true),
@@ -106,7 +106,7 @@ public class ComboModifyHandler {
         }
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "SameParameterValue"})
     private enum RemoveReleaseAction {
         COMBO_A3_END3(281, 306, 100),
         COMBO_A4_END(576, 608, 100),

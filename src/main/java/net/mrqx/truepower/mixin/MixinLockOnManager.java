@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @OnlyIn(Dist.CLIENT)
 @Mixin(LockOnManager.class)
 public class MixinLockOnManager {
-    @Redirect(method = "lambda$onEntityUpdate$9", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;rotLerp(FFF)F"))
+    @Redirect(method = "lambda$onEntityUpdate$9", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;rotLerp(FFF)F"), remap = false)
     private static float modifyStep(float pDelta, float pStart, float pEnd) {
         return Mth.rotLerp(pDelta * TruePowerModConfig.LOCK_ON_SPEED.get().floatValue(), pStart, pEnd);
     }
