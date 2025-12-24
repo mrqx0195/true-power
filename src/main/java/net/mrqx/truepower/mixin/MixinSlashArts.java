@@ -17,11 +17,11 @@ public class MixinSlashArts {
             at = @At(value = "INVOKE", target = "Lmods/flammpfeil/slashblade/slasharts/SlashArts;getComboStateJust(Lnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/resources/ResourceLocation;", remap = false),
             cancellable = true, remap = false)
     private void injectDoArts(SlashArts.ArtsType type, LivingEntity user, CallbackInfoReturnable<ResourceLocation> cir) {
-        if (type == SlashArts.ArtsType.Jackpot
-                && user instanceof ServerPlayer
-                && (JustSlashArtManager.addJustCount(user) > 3 || JustSlashArtManager.getJustCooldown(user) > 0)) {
-            JustSlashArtManager.setJustCooldown(user, 3);
-            cir.setReturnValue(ComboStateRegistry.NONE.getId());
+        if (type == SlashArts.ArtsType.Jackpot && user instanceof ServerPlayer) {
+            if (JustSlashArtManager.addJustCount(user) > 3 || JustSlashArtManager.getJustCooldown(user) > 0) {
+                JustSlashArtManager.setJustCooldown(user, 3);
+                cir.setReturnValue(ComboStateRegistry.NONE.getId());
+            }
         }
     }
 }

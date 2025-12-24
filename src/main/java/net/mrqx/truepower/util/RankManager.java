@@ -2,7 +2,7 @@ package net.mrqx.truepower.util;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
-import net.mrqx.truepower.TruePowerModConfig;
+import net.mrqx.truepower.config.TruePowerCommonConfig;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -43,7 +43,7 @@ public class RankManager {
     public static boolean addCombo(LivingEntity livingEntity, ResourceLocation combo) {
         cleanTimeoutCombo(livingEntity);
         LinkedList<Map.Entry<Long, ResourceLocation>> comboList = getComboList(livingEntity);
-        if (checkCombo(livingEntity, combo, TruePowerModConfig.COMBO_TIMEOUT_FOR_RANK_INCREASE.get())) {
+        if (checkCombo(livingEntity, combo, TruePowerCommonConfig.COMBO_TIMEOUT_FOR_RANK_INCREASE.get())) {
             return false;
         }
         comboList.addFirst(new ComboEntry(livingEntity.level().getGameTime(), combo));
@@ -54,8 +54,8 @@ public class RankManager {
         LinkedList<Map.Entry<Long, ResourceLocation>> comboList = getComboList(livingEntity);
         while (!comboList.isEmpty()) {
             Map.Entry<Long, ResourceLocation> entry = comboList.getLast();
-            if (comboList.size() > TruePowerModConfig.COMBO_LIST_LENGTH.get()
-                    || entry.getKey() < livingEntity.level().getGameTime() - TruePowerModConfig.COMBO_TIMEOUT_FOR_RANK_INCREASE.get()) {
+            if (comboList.size() > TruePowerCommonConfig.COMBO_LIST_LENGTH.get()
+                    || entry.getKey() < livingEntity.level().getGameTime() - TruePowerCommonConfig.COMBO_TIMEOUT_FOR_RANK_INCREASE.get()) {
                 comboList.removeLast();
             } else {
                 break;

@@ -9,7 +9,7 @@ import mods.flammpfeil.slashblade.util.AttackManager;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 import net.mrqx.truepower.TruePowerMod;
-import net.mrqx.truepower.TruePowerModConfig;
+import net.mrqx.truepower.config.TruePowerCommonConfig;
 import net.mrqx.truepower.util.TruePowerAttackManager;
 
 @SuppressWarnings("unused")
@@ -23,10 +23,10 @@ public class TruePowerComboStateRegistry {
             .nextOfTimeout(entity -> TruePowerMod.prefix("void_slash_sheath"))
             .addTickAction(entity -> entity.setDeltaMovement(0, entity.getDeltaMovement().y, 0))
             .addTickAction(ComboState.TimeLineTickAction.getBuilder()
-                    .put(16, livingEntity -> TruePowerAttackManager.doVoidSlashAttack(livingEntity, AttackManager.isPowered(livingEntity) ? TruePowerModConfig.POWERED_VOID_SLASH_DAMAGE_FIRST.get() : TruePowerModConfig.VOID_SLASH_DAMAGE.get()))
+                    .put(16, livingEntity -> TruePowerAttackManager.doVoidSlashAttack(livingEntity, AttackManager.isPowered(livingEntity) ? TruePowerCommonConfig.POWERED_VOID_SLASH_DAMAGE_FIRST.get() : TruePowerCommonConfig.VOID_SLASH_DAMAGE.get()))
                     .put(17, livingEntity -> {
                         if (AttackManager.isPowered(livingEntity)) {
-                            TruePowerAttackManager.doVoidSlashAttack(livingEntity, TruePowerModConfig.POWERED_VOID_SLASH_DAMAGE_SECOND.get());
+                            TruePowerAttackManager.doVoidSlashAttack(livingEntity, TruePowerCommonConfig.POWERED_VOID_SLASH_DAMAGE_SECOND.get());
                         }
                     })
                     .build())

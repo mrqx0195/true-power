@@ -1,5 +1,6 @@
 package net.mrqx.truepower.mixin;
 
+import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.ability.EnemyStep;
 import mods.flammpfeil.slashblade.ability.KickJump;
 import mods.flammpfeil.slashblade.ability.SlayerStyleArts;
@@ -30,7 +31,7 @@ public class MixinAdvancementHelper {
                 CompoundTag persistentData = player.getPersistentData();
                 ComboSyncMessage comboSyncMessage = new ComboSyncMessage();
 
-                comboSyncMessage.comboState = ComboStateRegistry.NONE.getId();
+                comboSyncMessage.comboState = ComboStateRegistry.NONE.getId() != null ? ComboStateRegistry.NONE.getId() : SlashBlade.prefix("none");
                 comboSyncMessage.lastActionTime = state.getLastActionTime();
                 comboSyncMessage.canMove = persistentData.getBoolean("truePower.canMove");
                 comboSyncMessage.jumpCancelOnly = persistentData.getBoolean("truePower.jumpCancelOnly");
@@ -44,7 +45,7 @@ public class MixinAdvancementHelper {
                 CompoundTag persistentData = player.getPersistentData();
                 ComboSyncMessage comboSyncMessage = new ComboSyncMessage();
 
-                comboSyncMessage.comboState = ComboStateRegistry.NONE.getId();
+                comboSyncMessage.comboState = ComboStateRegistry.NONE.getId() != null ? ComboStateRegistry.NONE.getId() : SlashBlade.prefix("none");
                 comboSyncMessage.lastActionTime = state.getLastActionTime();
                 comboSyncMessage.canMove = persistentData.getBoolean("truePower.canMove");
                 comboSyncMessage.jumpCancelOnly = persistentData.getBoolean("truePower.jumpCancelOnly");

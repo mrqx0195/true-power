@@ -16,6 +16,8 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
+import net.mrqx.truepower.config.TruePowerClientConfig;
+import net.mrqx.truepower.config.TruePowerCommonConfig;
 import net.mrqx.truepower.entity.EntityBlastSummonedSword;
 import net.mrqx.truepower.network.NetworkManager;
 import net.mrqx.truepower.registry.TruePowerComboStateRegistry;
@@ -31,7 +33,8 @@ public class TruePowerMod {
     }
 
     public TruePowerMod() {
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, TruePowerModConfig.COMMON_CONFIG);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, TruePowerClientConfig.CLIENT_CONFIG);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, TruePowerCommonConfig.COMMON_CONFIG);
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         TruePowerComboStateRegistry.COMBO_STATE.register(modEventBus);
         NetworkManager.register();
@@ -42,6 +45,7 @@ public class TruePowerMod {
     )
     public static class RegistryEvents {
         public static final ResourceLocation ENTITY_BLAST_SUMMONED_SWORD_RESOURCE_LOCATION = new ResourceLocation(TruePowerMod.MODID, classToString(EntityBlastSummonedSword.class));
+        @SuppressWarnings("NotNullFieldNotInitialized")
         public static EntityType<EntityBlastSummonedSword> BlastSummonedSword;
 
         @SubscribeEvent

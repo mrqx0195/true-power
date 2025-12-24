@@ -14,7 +14,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
 
 public class TruePowerAttackManager {
     public static void doVoidSlashAttack(LivingEntity living, double damage) {
@@ -43,7 +42,7 @@ public class TruePowerAttackManager {
         living.level().addFreshEntity(jc);
     }
 
-    private static @NotNull EntitySlashEffect getVoidSlashEffect(LivingEntity living, Vec3 pos) {
+    private static EntitySlashEffect getVoidSlashEffect(LivingEntity living, Vec3 pos) {
         EntitySlashEffect jc = new EntitySlashEffect(SlashBlade.RegistryEvents.SlashEffect, living.level()) {
 
             @Override

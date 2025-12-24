@@ -9,7 +9,7 @@ import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.mrqx.truepower.TruePowerModConfig;
+import net.mrqx.truepower.config.TruePowerCommonConfig;
 import net.mrqx.truepower.entity.EntityBlastSummonedSword;
 import net.mrqx.truepower.util.RankManager;
 
@@ -21,20 +21,20 @@ public class AttackEventHandler {
     public static void onLivingAttackEvent(LivingAttackEvent event) {
         if (event.getSource().getEntity() instanceof LivingEntity livingEntity) {
             livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
-                if (((state.getComboSeq().equals(ComboStateRegistry.RAPID_SLASH.getId()) && AttackManager.isPowered(livingEntity)) ||
-                        state.getComboSeq().equals(ComboStateRegistry.COMBO_C.getId())) && !event.getSource().isIndirect()
-                ) {
+                boolean isSummonSwordCombo = (state.getComboSeq().equals(ComboStateRegistry.RAPID_SLASH.getId()) && AttackManager.isPowered(livingEntity))
+                        || state.getComboSeq().equals(ComboStateRegistry.COMBO_C.getId());
+                if (isSummonSwordCombo && !event.getSource().isIndirect()) {
                     List<LivingEntity> entityList = EntityBlastSummonedSword.getPreSummonSwordList(livingEntity);
                     if (!entityList.contains(event.getEntity())) {
                         entityList.add(event.getEntity());
                     }
                 }
 
-                if ((RankManager.addCombo(livingEntity, state.getComboSeq()) || RankManager.checkCombo(livingEntity, state.getComboSeq(), 3))
-                        && RankManager.getRankCooldown(livingEntity) <= livingEntity.level().getGameTime()
-                ) {
+                boolean rankManagerCheck = (RankManager.addCombo(livingEntity, state.getComboSeq()) || RankManager.checkCombo(livingEntity, state.getComboSeq(), 3))
+                        && RankManager.getRankCooldown(livingEntity) <= livingEntity.level().getGameTime();
+                if (rankManagerCheck) {
                     livingEntity.getCapability(CapabilityConcentrationRank.RANK_POINT).ifPresent(rank -> {
-                        rank.addRankPoint(livingEntity, TruePowerModConfig.RANK_INCREASE_FOR_HIT.get());
+                        rank.addRankPoint(livingEntity, TruePowerCommonConfig.RANK_INCREASE_FOR_HIT.get());
                         RankManager.setRankCooldown(livingEntity, livingEntity.level().getGameTime() + 1);
                     });
                 }
@@ -45,7 +45,7 @@ public class AttackEventHandler {
     @SubscribeEvent
     public static void onLivingDeathEvent(LivingDeathEvent event) {
         if (event.getSource().getEntity() instanceof LivingEntity livingEntity) {
-            livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> RankManager.setPreAddRank(livingEntity, RankManager.getPreAddRank(livingEntity) + TruePowerModConfig.RANK_INCREASE_FOR_KILL.get()));
+            livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> RankManager.setPreAddRank(livingEntity, RankManager.getPreAddRank(livingEntity) + TruePowerCommonConfig.RANK_INCREASE_FOR_KILL.get()));
         }
     }
 }

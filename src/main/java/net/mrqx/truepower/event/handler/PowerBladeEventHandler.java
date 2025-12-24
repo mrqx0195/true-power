@@ -6,7 +6,7 @@ import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.mrqx.truepower.TruePowerModConfig;
+import net.mrqx.truepower.config.TruePowerCommonConfig;
 
 @Mod.EventBusSubscriber
 public class PowerBladeEventHandler {
@@ -16,7 +16,7 @@ public class PowerBladeEventHandler {
         if (!event.isPowered() &&
                 event.getBlade().getCapability(ItemSlashBlade.BLADESTATE).isPresent()) {
             entity.getCapability(CapabilityConcentrationRank.RANK_POINT).ifPresent((cr) -> {
-                if (cr.getRankPoint(entity.level().getGameTime()) >= TruePowerModConfig.POWERED_RANK_REQUIRE.get()) {
+                if (cr.getRankPoint(entity.level().getGameTime()) >= TruePowerCommonConfig.POWERED_RANK_REQUIRE.get()) {
                     event.setPowered(true);
                 }
             });

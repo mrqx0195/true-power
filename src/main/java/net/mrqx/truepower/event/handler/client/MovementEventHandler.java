@@ -54,8 +54,8 @@ public class MovementEventHandler {
                 input.jumping = false;
             }
 
-            if (input.forwardImpulse != 0 || input.leftImpulse != 0
-                    || (input.jumping && player.onGround())) {
+            boolean isJumping = input.jumping && player.onGround();
+            if (input.forwardImpulse != 0 || input.leftImpulse != 0 || isJumping) {
                 ComboCancelMessage comboCancelMessage = new ComboCancelMessage();
                 comboCancelMessage.isJump = input.jumping;
                 NetworkManager.INSTANCE.sendToServer(comboCancelMessage);

@@ -1,5 +1,6 @@
 package net.mrqx.truepower.network;
 
+import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import mods.flammpfeil.slashblade.registry.ComboStateRegistry;
 import net.minecraft.nbt.CompoundTag;
@@ -36,7 +37,7 @@ public class ComboCancelMessage {
                         CompoundTag persistentData = serverPlayer.getPersistentData();
                         ComboSyncMessage comboSyncMessage = new ComboSyncMessage();
 
-                        comboSyncMessage.comboState = ComboStateRegistry.NONE.getId();
+                        comboSyncMessage.comboState = ComboStateRegistry.NONE.getId() != null ? ComboStateRegistry.NONE.getId() : SlashBlade.prefix("none");
                         comboSyncMessage.lastActionTime = state.getLastActionTime();
                         comboSyncMessage.canMove = persistentData.getBoolean("truePower.canMove");
                         comboSyncMessage.jumpCancelOnly = persistentData.getBoolean("truePower.jumpCancelOnly");

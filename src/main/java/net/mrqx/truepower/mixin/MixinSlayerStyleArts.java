@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.EnumSet;
 
+@SuppressWarnings("SameReturnValue")
 @Mixin(SlayerStyleArts.class)
 public abstract class MixinSlayerStyleArts {
     @Shadow(remap = false)

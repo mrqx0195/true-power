@@ -16,7 +16,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.PacketDistributor;
 import net.mrqx.sbr_core.events.ComboStateRegistryEvent;
-import net.mrqx.truepower.TruePowerModConfig;
+import net.mrqx.truepower.config.TruePowerCommonConfig;
 import net.mrqx.truepower.entity.EntityBlastSummonedSword;
 import net.mrqx.truepower.network.ComboSyncMessage;
 import net.mrqx.truepower.network.NetworkManager;
@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ComboModifyHandler {
-    @SuppressWarnings({"unused", "SameParameterValue"})
+    @SuppressWarnings({"unused", "SameParameterValue", "AlibabaEnumConstantsMustHaveComment"})
     private enum ComboMovementModifiers {
         COMBO_A1(1, 10, 100, 2, true),
         COMBO_A1_END(10, 21, 100, 0, true),
@@ -106,7 +106,7 @@ public class ComboModifyHandler {
         }
     }
 
-    @SuppressWarnings({"unused", "SameParameterValue"})
+    @SuppressWarnings({"unused", "SameParameterValue", "AlibabaEnumConstantsMustHaveComment"})
     private enum RemoveReleaseAction {
         COMBO_A3_END3(281, 306, 100),
         COMBO_A4_END(576, 608, 100),
@@ -160,7 +160,7 @@ public class ComboModifyHandler {
                                 (modifier.canCancelFrame != -1) && (elapsedTime >= modifier.canCancelFrame));
 
                         livingEntity.getPersistentData().putBoolean("truePower.jumpCancelOnly", modifier.jumpCancelOnly);
-                        livingEntity.getPersistentData().putBoolean("truePower.noMoveEnable", TruePowerModConfig.CAN_NOT_MOVE_WHILE_COMBO.get());
+                        livingEntity.getPersistentData().putBoolean("truePower.noMoveEnable", TruePowerCommonConfig.CAN_NOT_MOVE_WHILE_COMBO.get());
 
                         if (livingEntity instanceof ServerPlayer serverPlayer) {
                             CompoundTag persistentData = serverPlayer.getPersistentData();
@@ -178,7 +178,8 @@ public class ComboModifyHandler {
                     }
                 }));
 
-                if ((modifier.equals(ComboMovementModifiers.RISING_STAR) || modifier.equals(ComboMovementModifiers.UPPER_SLASH_JUMP)) && combo.isAerial()) {
+                boolean isJumpCombo = modifier.equals(ComboMovementModifiers.RISING_STAR) || modifier.equals(ComboMovementModifiers.UPPER_SLASH_JUMP);
+                if (isJumpCombo && combo.isAerial()) {
                     builder.addTickAction((entityIn) -> {
 
                         long elapsed = ComboState.getElapsed(entityIn);
@@ -284,7 +285,7 @@ public class ComboModifyHandler {
 
                     livingEntity.getPersistentData().putBoolean("truePower.jumpCancelOnly", false);
 
-                    livingEntity.getPersistentData().putBoolean("truePower.noMoveEnable", TruePowerModConfig.CAN_NOT_MOVE_WHILE_COMBO.get());
+                    livingEntity.getPersistentData().putBoolean("truePower.noMoveEnable", TruePowerCommonConfig.CAN_NOT_MOVE_WHILE_COMBO.get());
 
                     if (livingEntity instanceof ServerPlayer serverPlayer) {
                         CompoundTag persistentData = serverPlayer.getPersistentData();
@@ -305,7 +306,7 @@ public class ComboModifyHandler {
     }
 
     public static void step(LivingEntity livingEntity, double step) {
-        if (TruePowerModConfig.STEP_WHEN_USING_COMBO.get()) {
+        if (TruePowerCommonConfig.STEP_WHEN_USING_COMBO.get()) {
             Vec3 input = new Vec3(0, 0, step);
 
             livingEntity.moveRelative(1, input);

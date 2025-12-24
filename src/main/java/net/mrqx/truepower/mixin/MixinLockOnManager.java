@@ -4,7 +4,7 @@ import mods.flammpfeil.slashblade.ability.LockOnManager;
 import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.mrqx.truepower.TruePowerModConfig;
+import net.mrqx.truepower.config.TruePowerClientConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -14,6 +14,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class MixinLockOnManager {
     @Redirect(method = "lambda$onEntityUpdate$9", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;rotLerp(FFF)F"), remap = false)
     private static float modifyStep(float pDelta, float pStart, float pEnd) {
-        return Mth.rotLerp(pDelta * TruePowerModConfig.LOCK_ON_SPEED.get().floatValue(), pStart, pEnd);
+        return Mth.rotLerp(pDelta * TruePowerClientConfig.LOCK_ON_SPEED.get().floatValue(), pStart, pEnd);
     }
 }

@@ -1,5 +1,6 @@
 package net.mrqx.truepower.network;
 
+import mods.flammpfeil.slashblade.SlashBlade;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -12,7 +13,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ComboSyncMessage {
-    public ResourceLocation comboState;
+    public ResourceLocation comboState = SlashBlade.prefix("none");
     public long lastActionTime;
     public boolean canMove;
     public boolean jumpCancelOnly;
