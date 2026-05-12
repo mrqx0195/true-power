@@ -6,6 +6,7 @@ import net.minecraft.client.player.Input;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.MovementInputUpdateEvent;
@@ -20,15 +21,16 @@ public class MovementEventHandler {
     @SubscribeEvent
     public static void onMovementInputUpdateEvent(MovementInputUpdateEvent event) {
         Player player = event.getEntity();
-        if (player.getMainHandItem().isEmpty()) {
+        ItemStack itemStack = player.getMainHandItem();
+        if (itemStack.isEmpty()) {
             return;
         }
-        player.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+        itemStack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
             CompoundTag persistentData = player.getPersistentData();
             Input input = event.getInput();
             if (!persistentData.getBoolean("truePower.noMoveEnable")
-                    || state.getComboSeq().equals(ComboStateRegistry.NONE.getId())
-                    || state.getComboSeq().equals(ComboStateRegistry.STANDBY.getId())) {
+                || state.getComboSeq().equals(ComboStateRegistry.NONE.getId())
+                || state.getComboSeq().equals(ComboStateRegistry.STANDBY.getId())) {
                 return;
             }
             if (state.getComboSeq().equals(new ResourceLocation(persistentData.getString("truePower.combo")))) {
@@ -53,7 +55,7 @@ public class MovementEventHandler {
                 input.leftImpulse = 0;
                 input.jumping = false;
             }
-
+            
             boolean isJumping = input.jumping && player.onGround();
             if (input.forwardImpulse != 0 || input.leftImpulse != 0 || isJumping) {
                 ComboCancelMessage comboCancelMessage = new ComboCancelMessage();

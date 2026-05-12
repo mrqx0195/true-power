@@ -2,6 +2,7 @@ package net.mrqx.truepower.event.handler.client;
 
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ComputeFovModifierEvent;
@@ -15,7 +16,8 @@ public class FovHandler {
     @SubscribeEvent
     public static void onComputeFovModifierEvent(ComputeFovModifierEvent event) {
         Player player = event.getPlayer();
-        if (player.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).isPresent() && TruePowerClientConfig.LOCK_FOV.get()) {
+        ItemStack itemStack = player.getMainHandItem();
+        if (!itemStack.isEmpty() && itemStack.getCapability(ItemSlashBlade.BLADESTATE).isPresent() && TruePowerClientConfig.LOCK_FOV.get()) {
             event.setNewFovModifier(TruePowerClientConfig.LOCKED_FOV_MODIFIER.get().floatValue());
         }
     }

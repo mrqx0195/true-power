@@ -12,6 +12,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -24,25 +25,29 @@ import java.util.*;
 public class EntityBlastSummonedSword extends EntityAbstractSummonedSword {
     private static final Map<UUID, List<LivingEntity>> PRE_SUMMON_MAP = new HashMap<>();
     private static final Map<UUID, List<EntityBlastSummonedSword>> PRE_BLAST_SWORD = new HashMap<>();
-
+    
     public static List<LivingEntity> getPreSummonSwordList(LivingEntity owner) {
         if (!PRE_SUMMON_MAP.containsKey(owner.getUUID())) {
             PRE_SUMMON_MAP.put(owner.getUUID(), new ArrayList<>());
         }
         return PRE_SUMMON_MAP.get(owner.getUUID());
     }
-
+    
     public static List<EntityBlastSummonedSword> getPreBlastSwordList(LivingEntity owner) {
         if (!PRE_BLAST_SWORD.containsKey(owner.getUUID())) {
             PRE_BLAST_SWORD.put(owner.getUUID(), new ArrayList<>());
         }
         return PRE_BLAST_SWORD.get(owner.getUUID());
     }
-
+    
     public static void setPreBlastSwordList(LivingEntity owner, final int count) {
+        ItemStack itemStack = owner.getMainHandItem();
+        if (itemStack.isEmpty()) {
+            return;
+        }
         List<EntityBlastSummonedSword> preBlastSwordList = getPreBlastSwordList(owner);
-        owner.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
-            int powerLevel = owner.getMainHandItem().getEnchantmentLevel(Enchantments.POWER_ARROWS);
+        itemStack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+            int powerLevel = itemStack.getEnchantmentLevel(Enchantments.POWER_ARROWS);
             List<LivingEntity> preSummonSwordList = getPreSummonSwordList(owner);
             List<LivingEntity> summonList = new ArrayList<>(preSummonSwordList);
             summonList.forEach(target -> {
@@ -59,7 +64,7 @@ public class EntityBlastSummonedSword extends EntityAbstractSummonedSword {
                     summonedSword.setPos(pos);
                     summonedSword.setDamage(powerLevel / 5.0);
                     summonedSword.setBurstDamage(powerLevel / 2.0);
-
+                    
                     Vec3 dir = targetPos.subtract(pos).normalize();
                     summonedSword.shoot(dir.x, dir.y, dir.z, 3.0F, 0.0F);
                     summonedSword.setOwner(owner);
@@ -73,28 +78,28 @@ public class EntityBlastSummonedSword extends EntityAbstractSummonedSword {
             preSummonSwordList.clear();
         });
     }
-
-
+    
+    
     private double burstDamage;
     private boolean hasBurst;
-
+    
     public EntityBlastSummonedSword(EntityType<? extends Projectile> entityTypeIn, Level worldIn) {
         super(entityTypeIn, worldIn);
         this.hasBurst = false;
     }
-
+    
     public void setBurstDamage(double damageIn) {
         this.burstDamage = damageIn;
     }
-
+    
     public double getBurstDamage() {
         return this.burstDamage;
     }
-
+    
     public static EntityBlastSummonedSword createInstance(PlayMessages.SpawnEntity packet, Level worldIn) {
         return new EntityBlastSummonedSword(TruePowerMod.RegistryEvents.BlastSummonedSword, worldIn);
     }
-
+    
     @Override
     public void burst() {
         if (!this.isAlive() || this.hasBurst) {
@@ -102,7 +107,7 @@ public class EntityBlastSummonedSword extends EntityAbstractSummonedSword {
         }
         super.burst();
     }
-
+    
     @Override
     public void burst(List<MobEffectInstance> effects, @Nullable Entity focusEntity) {
         List<Entity> list = TargetSelector.getTargettableEntitiesWithinAABB(this.level(), 2.0F, this);
@@ -114,7 +119,7 @@ public class EntityBlastSummonedSword extends EntityAbstractSummonedSword {
         super.burst(effects, focusEntity);
         this.hasBurst = true;
     }
-
+    
     @Override
     public float getOffsetYaw() {
         return this.getYRot();

@@ -26,9 +26,9 @@ public abstract class MixinJudgementCut {
     @Inject(method = "doJudgementCut(Lnet/minecraft/world/entity/LivingEntity;)Lmods/flammpfeil/slashblade/entity/EntityJudgementCut;", at = @At("RETURN"), remap = false)
     private static void injectDoJudgementCut(LivingEntity user, CallbackInfoReturnable<EntityJudgementCut> cir, @Local(name = "pos") Vec3 pos) {
         List<LivingEntity> entities = new java.util.ArrayList<>(user.level()
-                .getNearbyEntities(LivingEntity.class, TargetSelector.lockon, user, user.getBoundingBox().inflate(12.0F, 6.0F, 12.0F))
-                .stream().filter(livingEntity -> !livingEntity.position().add(0, livingEntity.getEyeHeight(), 0).equals(pos) && !livingEntity.position().add(0, livingEntity.getEyeHeight() / 2, 0).equals(pos))
-                .toList());
+            .getNearbyEntities(LivingEntity.class, TargetSelector.lockon, user, user.getBoundingBox().inflate(12.0F, 6.0F, 12.0F))
+            .stream().filter(livingEntity -> !livingEntity.position().add(0, livingEntity.getEyeHeight(), 0).equals(pos) && !livingEntity.position().add(0, livingEntity.getEyeHeight() / 2, 0).equals(pos))
+            .toList());
         if (!entities.isEmpty()) {
             for (int i = 0; i < TruePowerCommonConfig.JUDGEMENT_CUT_EXTRA_TARGET.get(); i++) {
                 if (entities.isEmpty()) {
@@ -41,14 +41,14 @@ public abstract class MixinJudgementCut {
                 EntityJudgementCut judgementCut = new EntityJudgementCut(SlashBlade.RegistryEvents.JudgementCut, level);
                 judgementCut.setPos(position.x, position.y, position.z);
                 judgementCut.setOwner(user);
-                user.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+                user.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
                     judgementCut.setColor(state.getColorCode());
                     if (state.getComboSeq().equals(ComboStateRegistry.JUDGEMENT_CUT_SLASH_JUST.getId())) {
                         judgementCut.setIsCritical(true);
                     }
                 });
                 user.getCapability(ConcentrationRankCapabilityProvider.RANK_POINT).ifPresent((rank) -> judgementCut.setRank(rank.getRankLevel(level.getGameTime())));
-
+                
                 level.addFreshEntity(judgementCut);
                 level.playSound(null, judgementCut.getX(), judgementCut.getY(), judgementCut.getZ(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.5F, 0.8F / (user.getRandom().nextFloat() * 0.4F + 0.8F));
             }
