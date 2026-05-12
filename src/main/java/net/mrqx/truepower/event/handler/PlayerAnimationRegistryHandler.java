@@ -15,17 +15,17 @@ import java.util.Map;
 public class PlayerAnimationRegistryHandler {
     private static final ResourceLocation MOTION_LOCATION = new ResourceLocation("slashblade", "model/pa/player_motion.vmd");
     private static final PlayerAnimationRegistryHandler INSTANCE = new PlayerAnimationRegistryHandler();
-
+    
     public static PlayerAnimationRegistryHandler getInstance() {
         return PlayerAnimationRegistryHandler.INSTANCE;
     }
-
+    
     public void register() {
         MinecraftForge.EVENT_BUS.register(this);
     }
-
+    
     @SubscribeEvent
-    public static void onSlashBladePlayerAnimationRegistryEvent(SlashBladePlayerAnimationRegistryEvent event) {
+    public void onSlashBladePlayerAnimationRegistryEvent(SlashBladePlayerAnimationRegistryEvent event) {
         Map<ResourceLocation, VmdAnimation> animation = event.getAnimation();
         animation.put(TruePowerComboStateRegistry.VOID_SLASH.getId(), (new VmdAnimation(MOTION_LOCATION, 2200, 2299, false)).setBlendLegs(false));
     }

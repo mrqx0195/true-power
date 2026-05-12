@@ -23,14 +23,12 @@ import java.util.function.Consumer;
 @SuppressWarnings("SameReturnValue")
 @Mixin(ComboStateRegistry.class)
 public abstract class MixinComboStateRegistry {
-    @SuppressWarnings({"InvalidInjectorMethodSignature", "MixinAnnotationTarget"})
-    @WrapOperation(method = "/lambda\\$static\\$(5|27)/", at = @At(value = "INVOKE", target = "Lmods/flammpfeil/slashblade/util/AttackManager;doSlash(Lnet/minecraft/world/entity/LivingEntity;FZZD)Lmods/flammpfeil/slashblade/entity/EntitySlashEffect;", remap = false), remap = false)
+    @WrapOperation(method = {"lambda$static$5", "lambda$static$27"}, at = @At(value = "INVOKE", target = "Lmods/flammpfeil/slashblade/util/AttackManager;doSlash(Lnet/minecraft/world/entity/LivingEntity;FZZD)Lmods/flammpfeil/slashblade/entity/EntitySlashEffect;", remap = false), remap = false)
     private static EntitySlashEffect modifyComboA1(LivingEntity playerIn, float roll, boolean mute, boolean critical, double comboRatio, Operation<EntitySlashEffect> original) {
         return original.call(playerIn, roll, mute, critical, 0.4);
     }
     
-    @SuppressWarnings({"InvalidInjectorMethodSignature", "MixinAnnotationTarget"})
-    @WrapOperation(method = "/lambda\\$static\\$(13|3[78])/", at = @At(value = "INVOKE", target = "Lmods/flammpfeil/slashblade/util/AttackManager;doSlash(Lnet/minecraft/world/entity/LivingEntity;FZZD)Lmods/flammpfeil/slashblade/entity/EntitySlashEffect;", remap = false), remap = false)
+    @WrapOperation(method = {"lambda$static$13", "lambda$static$37", "lambda$static$38"}, at = @At(value = "INVOKE", target = "Lmods/flammpfeil/slashblade/util/AttackManager;doSlash(Lnet/minecraft/world/entity/LivingEntity;FZZD)Lmods/flammpfeil/slashblade/entity/EntitySlashEffect;", remap = false), remap = false)
     private static EntitySlashEffect modifyComboA2(LivingEntity playerIn, float roll, boolean mute, boolean critical, double comboRatio, Operation<EntitySlashEffect> original) {
         return original.call(playerIn, roll, mute, critical, 0.5);
     }
