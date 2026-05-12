@@ -25,6 +25,7 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.mrqx.sbr_core.utils.InputStream;
+import net.mrqx.truepower.mixin.AccessorServerPlayer;
 import net.mrqx.truepower.util.JustSlashArtManager;
 
 import java.util.EnumSet;
@@ -78,7 +79,7 @@ public class TrickHandler {
             sender.playNotifySound(SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.5F, 1.2f);
             
             sender.move(MoverType.SELF, motion);
-            sender.isChangingDimension = true;
+            ((AccessorServerPlayer) sender).setIsChangingDimension(true);
             
             sender.connection.send(new ClientboundSetEntityMotionPacket(sender.getId(), motion.scale(0.5)));
             
@@ -98,7 +99,7 @@ public class TrickHandler {
             sender.move(MoverType.SELF, motion);
             if (sender.onGround()) {
                 Untouchable.setUntouchable(sender, TRICK_UNTOUCHABLE_TIME);
-                sender.isChangingDimension = true;
+                ((AccessorServerPlayer) sender).setIsChangingDimension(true);
                 
                 sender.connection.send(new ClientboundSetEntityMotionPacket(sender.getId(), motion.scale(0.75)));
                 
@@ -146,7 +147,7 @@ public class TrickHandler {
         
         Vec3 motion = new Vec3(0.0F, 0.8, 0.0F);
         sender.move(MoverType.SELF, motion);
-        sender.isChangingDimension = true;
+        ((AccessorServerPlayer) sender).setIsChangingDimension(true);
         sender.connection.send(new ClientboundSetEntityMotionPacket(sender.getId(), motion.scale(0.75F)));
         
         persistentData.putInt(SlayerStyleArts.AVOID_TRICKUP_PATH, 2);
