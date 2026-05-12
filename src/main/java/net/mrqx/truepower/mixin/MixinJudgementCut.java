@@ -1,10 +1,10 @@
 package net.mrqx.truepower.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import mods.flammpfeil.slashblade.SlashBlade;
-import mods.flammpfeil.slashblade.capability.concentrationrank.ConcentrationRankCapabilityProvider;
+import mods.flammpfeil.slashblade.RegistryEvents;
+import mods.flammpfeil.slashblade.capability.concentrationrank.CapabilityConcentrationRank;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.entity.EntityJudgementCut;
-import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import mods.flammpfeil.slashblade.registry.ComboStateRegistry;
 import mods.flammpfeil.slashblade.slasharts.JudgementCut;
 import mods.flammpfeil.slashblade.util.TargetSelector;
@@ -38,16 +38,16 @@ public abstract class MixinJudgementCut {
                 entities.remove(entity);
                 Vec3 position = entity.position().add(0, entity.getEyeHeight() / 2.0F, 0);
                 Level level = entity.level();
-                EntityJudgementCut judgementCut = new EntityJudgementCut(SlashBlade.RegistryEvents.JudgementCut, level);
+                EntityJudgementCut judgementCut = new EntityJudgementCut(RegistryEvents.JudgementCut, level);
                 judgementCut.setPos(position.x, position.y, position.z);
                 judgementCut.setOwner(user);
-                user.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+                BladeStateAccess.of(user.getMainHandItem()).ifPresent(state -> {
                     judgementCut.setColor(state.getColorCode());
                     if (state.getComboSeq().equals(ComboStateRegistry.JUDGEMENT_CUT_SLASH_JUST.getId())) {
                         judgementCut.setIsCritical(true);
                     }
                 });
-                user.getCapability(ConcentrationRankCapabilityProvider.RANK_POINT).ifPresent((rank) -> judgementCut.setRank(rank.getRankLevel(level.getGameTime())));
+                judgementCut.setRank(entity.getData(CapabilityConcentrationRank.RANK_POINT.get()).getRankLevel(level.getGameTime()));
                 
                 level.addFreshEntity(judgementCut);
                 level.playSound(null, judgementCut.getX(), judgementCut.getY(), judgementCut.getZ(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.5F, 0.8F / (user.getRandom().nextFloat() * 0.4F + 0.8F));

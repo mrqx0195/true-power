@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(SummonedSwordArts.class)
 public class MixinSummonedSwordArts {
-    @WrapOperation(method = "lambda$onInputChange$0",
+    @WrapOperation(method = "onInputChange(Lmods/flammpfeil/slashblade/event/handler/InputCommandEvent;)V",
         at = @At(
             value = "INVOKE",
             target = "Lmods/flammpfeil/slashblade/event/Scheduler;schedule(Ljava/lang/String;JLnet/minecraft/world/level/timers/TimerCallback;)V",

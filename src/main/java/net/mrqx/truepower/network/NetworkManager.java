@@ -1,20 +1,18 @@
 package net.mrqx.truepower.network;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
-import net.mrqx.truepower.TruePowerMod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
+@EventBusSubscriber
 public class NetworkManager {
-
     private static final String PROTOCOL_VERSION = "1";
-
-    public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(TruePowerMod.MODID, "main"), () -> PROTOCOL_VERSION, PROTOCOL_VERSION::equals,
-            PROTOCOL_VERSION::equals);
-
-    public static void register() {
-        INSTANCE.registerMessage(0, ComboCancelMessage.class, ComboCancelMessage::encode, ComboCancelMessage::decode, ComboCancelMessage::handle);
-        INSTANCE.registerMessage(1, ComboSyncMessage.class, ComboSyncMessage::encode, ComboSyncMessage::decode, ComboSyncMessage::handle);
+    
+    @SubscribeEvent
+    public static void onRegisterPayloadHandlersEvent(RegisterPayloadHandlersEvent event) {
+        PayloadRegistrar registrar = event.registrar(PROTOCOL_VERSION);
+        registrar.playToServer(ComboCancelMessage.TYPE, ComboCancelMessage.STREAM_CODEC, ComboCancelMessage::handle);
+        registrar.playToClient(ComboSyncMessage.TYPE, ComboSyncMessage.STREAM_CODEC, ComboSyncMessage::handle);
     }
 }

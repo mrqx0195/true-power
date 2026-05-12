@@ -19,9 +19,9 @@ import java.util.Map;
 @Mixin(ComboCommands.class)
 public abstract class MixinComboCommands {
     @Inject(method = "initStandByCommand(Lnet/minecraft/world/entity/LivingEntity;Ljava/util/Map;)Lnet/minecraft/resources/ResourceLocation;",
-            at = @At(value = "RETURN"),
-            remap = false,
-            cancellable = true)
+        at = @At(value = "RETURN"),
+        remap = false,
+        cancellable = true)
     private static void injectInitStandByCommand(LivingEntity a, Map<EnumSet<InputCommand>, ResourceLocation> map, CallbackInfoReturnable<ResourceLocation> cir, @Local(name = "commands") EnumSet<InputCommand> commands) {
         if (VoidSlashHandler.doVoidSlash(a, commands)) {
             JustSlashArtManager.resetJustCount(a);

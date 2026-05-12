@@ -2,10 +2,9 @@ package net.mrqx.truepower.event.handler;
 
 import mods.flammpfeil.slashblade.ability.SlayerStyleArts;
 import mods.flammpfeil.slashblade.ability.Untouchable;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.capability.slashblade.ISlashBladeState;
-import mods.flammpfeil.slashblade.capability.slashblade.SlashBladeState;
 import mods.flammpfeil.slashblade.event.handler.InputCommandEvent;
-import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import mods.flammpfeil.slashblade.item.SwordType;
 import mods.flammpfeil.slashblade.registry.ComboStateRegistry;
 import mods.flammpfeil.slashblade.util.AdvancementHelper;
@@ -18,20 +17,24 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.mrqx.sbr_core.utils.InputStream;
 import net.mrqx.truepower.mixin.AccessorServerPlayer;
 import net.mrqx.truepower.util.JustSlashArtManager;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.EnumSet;
 import java.util.LinkedList;
+import java.util.Optional;
 
-@Mod.EventBusSubscriber
+@EventBusSubscriber
 public class TrickHandler {
     static final int TRICK_UNTOUCHABLE_TIME = 10;
     
@@ -48,12 +51,15 @@ public class TrickHandler {
         EnumSet<InputCommand> current = event.getCurrent();
         ServerPlayer sender = event.getEntity();
         ItemStack blade = sender.getMainHandItem();
-        ISlashBladeState bladeState = blade.getCapability(ItemSlashBlade.BLADESTATE).orElse(new SlashBladeState(blade));
+        Optional<ISlashBladeState> bladeStateOptional = BladeStateAccess.of(blade);
+        if (bladeStateOptional.isEmpty()) {
+            return;
+        }
+        ISlashBladeState bladeState = bladeStateOptional.get();
         
         InputStream inputStream = InputStream.getOrCreateInputStream(sender);
         
-        if (blade.isEmpty()
-            || bladeState.isBroken()
+        if (bladeState.isBroken()
             || bladeState.isSealed()
             || !SwordType.from(blade).contains(SwordType.BEWITCHED)
             || (sender.getPersistentData().getInt("truepower.avoid.trick") > 0)) {
@@ -125,11 +131,14 @@ public class TrickHandler {
         EnumSet<InputCommand> current = event.getCurrent();
         ServerPlayer sender = event.getEntity();
         ItemStack blade = sender.getMainHandItem();
-        ISlashBladeState bladeState = blade.getCapability(ItemSlashBlade.BLADESTATE).orElse(new SlashBladeState(blade));
+        Optional<ISlashBladeState> bladeStateOptional = BladeStateAccess.of(blade);
+        if (bladeStateOptional.isEmpty()) {
+            return;
+        }
+        ISlashBladeState bladeState = bladeStateOptional.get();
         CompoundTag persistentData = sender.getPersistentData();
         
-        if (blade.isEmpty()
-            || bladeState.isBroken()
+        if (bladeState.isBroken()
             || bladeState.isSealed()
             || !SwordType.from(blade).contains(SwordType.BEWITCHED)
             || (persistentData.getInt("truepower.avoid.trick") > 0)
@@ -165,21 +174,19 @@ public class TrickHandler {
     }
     
     @SubscribeEvent
-    public static void onTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase != TickEvent.Phase.START) {
-            return;
-        }
-        
-        if (event.player.getPersistentData().getInt("truepower.avoid.trick") > 0) {
-            int count = event.player.getPersistentData().getInt("truepower.avoid.trick");
+    public static void onTick(PlayerTickEvent.Pre event) {
+        Player player = event.getEntity();
+        CompoundTag persistentData = player.getPersistentData();
+        if (persistentData.getInt("truepower.avoid.trick") > 0) {
+            int count = persistentData.getInt("truepower.avoid.trick");
             count--;
             if (count <= 0) {
-                event.player.getPersistentData().remove("truepower.avoid.trick");
-                if (event.player instanceof ServerPlayer) {
-                    ((ServerPlayer) event.player).hasChangedDimension();
+                persistentData.remove("truepower.avoid.trick");
+                if (player instanceof ServerPlayer serverPlayer) {
+                    serverPlayer.hasChangedDimension();
                 }
             } else {
-                event.player.getPersistentData().putInt("truepower.avoid.trick", count);
+                persistentData.putInt("truepower.avoid.trick", count);
             }
         }
     }
@@ -187,9 +194,11 @@ public class TrickHandler {
     public static Vec3 maybeBackOffFromEdge(Vec3 vec, LivingEntity mover) {
         double d0 = vec.x;
         double d1 = vec.z;
+        AABB boundingBox = mover.getBoundingBox();
+        float maxUpStep = mover.maxUpStep();
+        Level level = mover.level();
         
-        while (d0 != 0 && mover.level().noCollision(mover,
-            mover.getBoundingBox().move(d0, -mover.maxUpStep(), 0))) {
+        while (d0 != 0 && level.noCollision(mover, boundingBox.move(d0, -maxUpStep, 0))) {
             if (d0 < 0.05 && d0 >= -0.05) {
                 d0 = 0;
             } else if (d0 > 0) {
@@ -199,8 +208,7 @@ public class TrickHandler {
             }
         }
         
-        while (d1 != 0 && mover.level().noCollision(mover,
-            mover.getBoundingBox().move(0, -mover.maxUpStep(), d1))) {
+        while (d1 != 0 && level.noCollision(mover, boundingBox.move(0, -maxUpStep, d1))) {
             if (d1 < 0.05 && d1 >= -0.05) {
                 d1 = 0;
             } else if (d1 > 0) {
@@ -210,8 +218,7 @@ public class TrickHandler {
             }
         }
         
-        while (d0 != 0 && d1 != 0 && mover.level().noCollision(mover,
-            mover.getBoundingBox().move(d0, -mover.maxUpStep(), d1))) {
+        while (d0 != 0 && d1 != 0 && level.noCollision(mover, boundingBox.move(d0, -maxUpStep, d1))) {
             if (d0 < 0.05 && d0 >= -0.05) {
                 d0 = 0;
             } else if (d0 > 0) {

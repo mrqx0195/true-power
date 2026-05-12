@@ -1,7 +1,7 @@
 package net.mrqx.truepower.mixin;
 
 import mods.flammpfeil.slashblade.capability.concentrationrank.CapabilityConcentrationRank;
-import mods.flammpfeil.slashblade.item.ItemSlashBlade;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.util.AttackManager;
 import net.minecraft.world.entity.LivingEntity;
 import net.mrqx.truepower.entity.EntityBlastSummonedSword;
@@ -21,7 +21,7 @@ public abstract class MixinAttackManager {
         if (entity.level().isClientSide) {
             return;
         }
-        entity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+        BladeStateAccess.of(entity.getMainHandItem()).ifPresent(state -> {
             List<EntityBlastSummonedSword> preBlastSwordList = EntityBlastSummonedSword.getPreBlastSwordList(entity);
             List<EntityBlastSummonedSword> preBlastSwordList1 = new ArrayList<>(preBlastSwordList);
             preBlastSwordList1.forEach(e -> {
@@ -31,10 +31,8 @@ public abstract class MixinAttackManager {
             });
             preBlastSwordList.clear();
             if (!entity.level().isClientSide()) {
-                entity.getCapability(CapabilityConcentrationRank.RANK_POINT).ifPresent(rank -> {
-                    rank.addRankPoint(entity, RankManager.getPreAddRank(entity));
-                    RankManager.setPreAddRank(entity, 0);
-                });
+                entity.getData(CapabilityConcentrationRank.RANK_POINT).addRankPoint(entity, RankManager.getPreAddRank(entity));
+                RankManager.setPreAddRank(entity, 0);
             }
         });
     }

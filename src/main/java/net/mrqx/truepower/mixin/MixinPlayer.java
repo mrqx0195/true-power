@@ -2,10 +2,9 @@ package net.mrqx.truepower.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import mods.flammpfeil.slashblade.item.ItemSlashBlade;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Slice;
@@ -20,8 +19,7 @@ public abstract class MixinPlayer {
     )
     private void wrapOperationSetPoseInUpdatePlayerPose(Player instance, Pose pose, Operation<Void> original) {
         if (pose.equals(Pose.CROUCHING) || pose.equals(Pose.SWIMMING)) {
-            ItemStack itemStack = instance.getMainHandItem();
-            if (!itemStack.isEmpty() && itemStack.getCapability(ItemSlashBlade.BLADESTATE).isPresent()) {
+            if (BladeStateAccess.of(instance.getMainHandItem()).isPresent()) {
                 original.call(instance, Pose.STANDING);
                 return;
             }

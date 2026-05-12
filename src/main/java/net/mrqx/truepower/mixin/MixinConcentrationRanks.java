@@ -16,16 +16,17 @@ public abstract class MixinConcentrationRanks {
     @Shadow(remap = false)
     @Final
     Range<Float> pointRange;
-
+    
     @Shadow(remap = false)
     @Final
     public int level;
-
+    
     @Shadow(remap = false)
     public static float MAX_LEVEL;
-
+    
+    @SuppressWarnings("NameDoesntMatchTargetClass")
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void injectInit(String par1, int par2, int level, Range<Float> pointRange, CallbackInfo ci) {
+    private void injectInit(String name, int ordinal, int level, Range<Float> pointRange, CallbackInfo ci) {
         if (this.level == 5) {
             this.pointRange = Range.closedOpen(5.0F, 6.0F);
         } else if (this.level == 6) {
@@ -34,7 +35,7 @@ public abstract class MixinConcentrationRanks {
             this.pointRange = Range.atLeast(7.0F);
         }
     }
-
+    
     @Inject(method = "<clinit>", at = @At("RETURN"))
     private static void injectClInit(CallbackInfo ci) {
         MAX_LEVEL = 8;

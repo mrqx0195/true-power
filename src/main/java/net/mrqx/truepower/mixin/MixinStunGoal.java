@@ -12,12 +12,12 @@ public abstract class MixinStunGoal extends Goal {
     @Shadow(remap = false)
     @Final
     private PathfinderMob entity;
-
+    
     @Override
     public boolean isInterruptable() {
         return false;
     }
-
+    
     @SuppressWarnings("DataFlowIssue")
     @Override
     public void tick() {

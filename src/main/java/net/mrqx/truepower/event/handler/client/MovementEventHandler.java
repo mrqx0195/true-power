@@ -1,22 +1,20 @@
 package net.mrqx.truepower.event.handler.client;
 
-import mods.flammpfeil.slashblade.item.ItemSlashBlade;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.registry.ComboStateRegistry;
 import net.minecraft.client.player.Input;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.MovementInputUpdateEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.mrqx.truepower.network.ComboCancelMessage;
-import net.mrqx.truepower.network.NetworkManager;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 
-@Mod.EventBusSubscriber(Dist.CLIENT)
-@OnlyIn(Dist.CLIENT)
+@EventBusSubscriber(Dist.CLIENT)
 public class MovementEventHandler {
     @SubscribeEvent
     public static void onMovementInputUpdateEvent(MovementInputUpdateEvent event) {
@@ -25,7 +23,7 @@ public class MovementEventHandler {
         if (itemStack.isEmpty()) {
             return;
         }
-        itemStack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+        BladeStateAccess.of(itemStack).ifPresent(state -> {
             CompoundTag persistentData = player.getPersistentData();
             Input input = event.getInput();
             if (!persistentData.getBoolean("truePower.noMoveEnable")
@@ -33,7 +31,7 @@ public class MovementEventHandler {
                 || state.getComboSeq().equals(ComboStateRegistry.STANDBY.getId())) {
                 return;
             }
-            if (state.getComboSeq().equals(new ResourceLocation(persistentData.getString("truePower.combo")))) {
+            if (state.getComboSeq().equals(ResourceLocation.tryParse(persistentData.getString("truePower.combo")))) {
                 if (!player.onGround()) {
                     input.forwardImpulse = 0;
                     input.leftImpulse = 0;
@@ -58,9 +56,8 @@ public class MovementEventHandler {
             
             boolean isJumping = input.jumping && player.onGround();
             if (input.forwardImpulse != 0 || input.leftImpulse != 0 || isJumping) {
-                ComboCancelMessage comboCancelMessage = new ComboCancelMessage();
-                comboCancelMessage.isJump = input.jumping;
-                NetworkManager.INSTANCE.sendToServer(comboCancelMessage);
+                ComboCancelMessage comboCancelMessage = new ComboCancelMessage(input.jumping);
+                PacketDistributor.sendToServer(comboCancelMessage);
             }
         });
     }

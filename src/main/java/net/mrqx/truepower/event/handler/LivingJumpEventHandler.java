@@ -1,15 +1,15 @@
 package net.mrqx.truepower.event.handler;
 
-import mods.flammpfeil.slashblade.item.ItemSlashBlade;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.registry.ComboStateRegistry;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingEvent;
 
-@Mod.EventBusSubscriber
+@EventBusSubscriber
 public class LivingJumpEventHandler {
     @SubscribeEvent
-    public void onPlayerJump(LivingEvent.LivingJumpEvent event) {
-        event.getEntity().getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> state.updateComboSeq(event.getEntity(), ComboStateRegistry.NONE.getId()));
+    public static void onPlayerJump(LivingEvent.LivingJumpEvent event) {
+        BladeStateAccess.of(event.getEntity().getMainHandItem()).ifPresent(state -> state.updateComboSeq(event.getEntity(), ComboStateRegistry.NONE.getId()));
     }
 }

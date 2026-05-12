@@ -1,9 +1,9 @@
 package net.mrqx.truepower.entity;
 
 import mods.flammpfeil.slashblade.ability.StunManager;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.entity.EntityAbstractSummonedSword;
 import mods.flammpfeil.slashblade.entity.Projectile;
-import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import mods.flammpfeil.slashblade.util.TargetSelector;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -16,7 +16,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PlayMessages;
 import net.mrqx.truepower.TruePowerMod;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,8 +45,8 @@ public class EntityBlastSummonedSword extends EntityAbstractSummonedSword {
             return;
         }
         List<EntityBlastSummonedSword> preBlastSwordList = getPreBlastSwordList(owner);
-        itemStack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
-            int powerLevel = itemStack.getEnchantmentLevel(Enchantments.POWER_ARROWS);
+        BladeStateAccess.of(itemStack).ifPresent(state -> {
+            int powerLevel = itemStack.getEnchantmentLevel(owner.registryAccess().holderOrThrow(Enchantments.POWER));
             List<LivingEntity> preSummonSwordList = getPreSummonSwordList(owner);
             List<LivingEntity> summonList = new ArrayList<>(preSummonSwordList);
             summonList.forEach(target -> {
@@ -94,10 +93,6 @@ public class EntityBlastSummonedSword extends EntityAbstractSummonedSword {
     
     public double getBurstDamage() {
         return this.burstDamage;
-    }
-    
-    public static EntityBlastSummonedSword createInstance(PlayMessages.SpawnEntity packet, Level worldIn) {
-        return new EntityBlastSummonedSword(TruePowerMod.RegistryEvents.BlastSummonedSword, worldIn);
     }
     
     @Override

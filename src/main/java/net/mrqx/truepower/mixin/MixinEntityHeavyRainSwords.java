@@ -2,9 +2,8 @@ package net.mrqx.truepower.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import mods.flammpfeil.slashblade.capability.inputstate.CapabilityInputState;
 import mods.flammpfeil.slashblade.capability.inputstate.IInputState;
-import mods.flammpfeil.slashblade.capability.inputstate.InputState;
-import mods.flammpfeil.slashblade.capability.inputstate.InputStateCapabilityProvider;
 import mods.flammpfeil.slashblade.entity.EntityHeavyRainSwords;
 import mods.flammpfeil.slashblade.util.InputCommand;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,7 +18,7 @@ public class MixinEntityHeavyRainSwords {
     )
     private boolean wrapOperationItFired(EntityHeavyRainSwords instance, Operation<Boolean> original) {
         if (instance.getOwner() instanceof LivingEntity livingEntity) {
-            IInputState inputState = instance.getOwner().getCapability(InputStateCapabilityProvider.INPUT_STATE).orElse(new InputState());
+            IInputState inputState = instance.getOwner().getData(CapabilityInputState.INPUT_STATE);
             if (inputState.getCommands(livingEntity).contains(InputCommand.M_DOWN)) {
                 return false;
             }

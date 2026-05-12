@@ -1,54 +1,61 @@
 package net.mrqx.truepower.network;
 
-import mods.flammpfeil.slashblade.SlashBlade;
-import mods.flammpfeil.slashblade.item.ItemSlashBlade;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
+import mods.flammpfeil.slashblade.capability.slashblade.ISlashBladeState;
 import mods.flammpfeil.slashblade.registry.ComboStateRegistry;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.PacketDistributor;
+import net.minecraft.world.entity.player.Player;
+import net.mrqx.truepower.TruePowerMod;
 import net.mrqx.truepower.event.ComboCancelEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import java.util.function.Supplier;
-
-public class ComboCancelMessage {
-    public boolean isJump;
-
-    public static ComboCancelMessage decode(FriendlyByteBuf buf) {
-        ComboCancelMessage comboCancelMessage = new ComboCancelMessage();
-        comboCancelMessage.isJump = buf.readBoolean();
-        return comboCancelMessage;
+public record ComboCancelMessage(boolean isJump) implements CustomPacketPayload {
+    public static final Type<ComboCancelMessage> TYPE = new Type<>(TruePowerMod.prefix("combo_cancel"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, ComboCancelMessage> STREAM_CODEC = CustomPacketPayload
+        .codec(ComboCancelMessage::write, ComboCancelMessage::new);
+    
+    private ComboCancelMessage(RegistryFriendlyByteBuf buf) {
+        this(buf.readBoolean());
     }
-
-    public static void encode(ComboCancelMessage msg, FriendlyByteBuf buf) {
-        buf.writeBoolean(msg.isJump);
+    
+    private void write(RegistryFriendlyByteBuf buf) {
+        buf.writeBoolean(this.isJump);
     }
-
-    public static void handle(ComboCancelMessage msg, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            ServerPlayer serverPlayer = ctx.get().getSender();
-            if (serverPlayer != null) {
-                serverPlayer.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
-                    ComboCancelEvent event = new ComboCancelEvent(serverPlayer.getMainHandItem(), state, serverPlayer, msg.isJump);
-                    if (!MinecraftForge.EVENT_BUS.post(event)) {
-                        state.updateComboSeq(serverPlayer, ComboStateRegistry.NONE.getId());
-                        CompoundTag persistentData = serverPlayer.getPersistentData();
-                        ComboSyncMessage comboSyncMessage = new ComboSyncMessage();
-
-                        comboSyncMessage.comboState = ComboStateRegistry.NONE.getId() != null ? ComboStateRegistry.NONE.getId() : SlashBlade.prefix("none");
-                        comboSyncMessage.lastActionTime = state.getLastActionTime();
-                        comboSyncMessage.canMove = persistentData.getBoolean("truePower.canMove");
-                        comboSyncMessage.jumpCancelOnly = persistentData.getBoolean("truePower.jumpCancelOnly");
-                        comboSyncMessage.noMoveEnable = persistentData.getBoolean("truePower.noMoveEnable");
-                        comboSyncMessage.syncCombo = true;
-
-                        NetworkManager.INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer), comboSyncMessage);
-                    }
-                });
-            }
-        });
-        ctx.get().setPacketHandled(true);
+    
+    @Override
+    public Type<ComboCancelMessage> type() {
+        return TYPE;
+    }
+    
+    public static void handle(ComboCancelMessage msg, IPayloadContext ctx) {
+        Player player = ctx.player();
+        if (player instanceof ServerPlayer serverPlayer) {
+            BladeStateAccess.of(serverPlayer.getMainHandItem()).ifPresent(state -> {
+                ComboCancelEvent event = new ComboCancelEvent(serverPlayer.getMainHandItem(), state, serverPlayer, msg.isJump);
+                if (!NeoForge.EVENT_BUS.post(event).isCanceled()) {
+                    state.updateComboSeq(serverPlayer, ComboStateRegistry.NONE.getId());
+                    ComboSyncMessage comboSyncMessage = getComboSyncMessage(serverPlayer, state);
+                    PacketDistributor.sendToPlayer(serverPlayer, comboSyncMessage);
+                }
+            });
+        }
+    }
+    
+    private static ComboSyncMessage getComboSyncMessage(ServerPlayer serverPlayer, ISlashBladeState state) {
+        CompoundTag persistentData = serverPlayer.getPersistentData();
+        return new ComboSyncMessage(
+            ComboStateRegistry.NONE.getId(),
+            state.getLastActionTime(),
+            persistentData.getBoolean("truePower.canMove"),
+            persistentData.getBoolean("truePower.jumpCancelOnly"),
+            persistentData.getBoolean("truePower.noMoveEnable"),
+            true
+        );
     }
 }
