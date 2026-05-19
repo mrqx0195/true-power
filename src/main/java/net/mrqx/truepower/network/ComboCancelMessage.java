@@ -25,7 +25,7 @@ public record ComboCancelMessage(boolean isJump) implements CustomPacketPayload 
     }
     
     private void write(RegistryFriendlyByteBuf buf) {
-        buf.writeBoolean(this.isJump);
+        buf.writeBoolean(this.isJump());
     }
     
     @Override
@@ -37,7 +37,7 @@ public record ComboCancelMessage(boolean isJump) implements CustomPacketPayload 
         Player player = ctx.player();
         if (player instanceof ServerPlayer serverPlayer) {
             BladeStateAccess.of(serverPlayer.getMainHandItem()).ifPresent(state -> {
-                ComboCancelEvent event = new ComboCancelEvent(serverPlayer.getMainHandItem(), state, serverPlayer, msg.isJump);
+                ComboCancelEvent event = new ComboCancelEvent(serverPlayer.getMainHandItem(), state, serverPlayer, msg.isJump());
                 if (!NeoForge.EVENT_BUS.post(event).isCanceled()) {
                     state.updateComboSeq(serverPlayer, ComboStateRegistry.NONE.getId());
                     ComboSyncMessage comboSyncMessage = getComboSyncMessage(serverPlayer, state);
