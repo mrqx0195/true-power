@@ -7,7 +7,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.mrqx.truepower.util.JustSlashArtManager;
 
 @Mod.EventBusSubscriber
-public class JustSlashArtHandler {
+public final class JustSlashArtHandler {
     @SubscribeEvent
     public static void onPlayerTickEvent(TickEvent.PlayerTickEvent event) {
         if (event.phase != TickEvent.Phase.START || !(event.player instanceof ServerPlayer)) {

@@ -1,0 +1,17 @@
+{
+  "behavior": {
+    "cancelAction": {
+      "frame": 20,
+      "jumpOnly": true
+    },
+    "tickSummonBlastSword": {
+      "normalCount": 1,
+      "poweredCount": 6,
+      "tick": 10
+    }
+  },
+  "end_frame": 459,
+  "name": "slashblade.combo_c",
+  "priority": 100,
+  "start_frame": 400
+}

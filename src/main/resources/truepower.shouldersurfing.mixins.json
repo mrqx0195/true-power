@@ -1,0 +1,17 @@
+{
+  "client": [
+  ],
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "mixins": [
+    "AccessorShoulderSurfing",
+    "MixinLockOnManager",
+    "MixinLockOnUtils",
+    "MixinMoveInputHandler",
+    "MixinShoulderSurfingCamera"
+  ],
+  "package": "net.mrqx.truepower.compat.shouldersurfing.mixin",
+  "refmap": "truepower.refmap.json",
+  "plugin": "net.mrqx.truepower.compat.shouldersurfing.ShoulderSurfingMixinPlugin",
+  "required": true
+}

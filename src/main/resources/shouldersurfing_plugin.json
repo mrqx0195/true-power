@@ -1,0 +1,5 @@
+{
+  "entrypoints": [
+    "net.mrqx.truepower.compat.shouldersurfing.TruePowerShoulderSurfingPlugin"
+  ]
+}

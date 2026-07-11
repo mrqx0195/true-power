@@ -5,7 +5,7 @@ import mods.flammpfeil.slashblade.registry.combo.ComboCommands;
 import mods.flammpfeil.slashblade.util.InputCommand;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
-import net.mrqx.truepower.event.handler.combo.VoidSlashHandler;
+import net.mrqx.truepower.combo.VoidSlashHandler;
 import net.mrqx.truepower.registry.TruePowerComboStateRegistry;
 import net.mrqx.truepower.util.JustSlashArtManager;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,9 +19,9 @@ import java.util.Map;
 @Mixin(ComboCommands.class)
 public abstract class MixinComboCommands {
     @Inject(method = "initStandByCommand(Lnet/minecraft/world/entity/LivingEntity;Ljava/util/Map;)Lnet/minecraft/resources/ResourceLocation;",
-            at = @At(value = "RETURN"),
-            remap = false,
-            cancellable = true)
+        at = @At(value = "RETURN"),
+        remap = false,
+        cancellable = true)
     private static void injectInitStandByCommand(LivingEntity a, Map<EnumSet<InputCommand>, ResourceLocation> map, CallbackInfoReturnable<ResourceLocation> cir, @Local(name = "commands") EnumSet<InputCommand> commands) {
         if (VoidSlashHandler.doVoidSlash(a, commands)) {
             JustSlashArtManager.resetJustCount(a);

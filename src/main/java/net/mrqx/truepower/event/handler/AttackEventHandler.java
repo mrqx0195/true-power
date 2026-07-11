@@ -17,7 +17,7 @@ import net.mrqx.truepower.util.RankManager;
 import java.util.List;
 
 @Mod.EventBusSubscriber
-public class AttackEventHandler {
+public final class AttackEventHandler {
     @SubscribeEvent
     public static void onLivingAttackEvent(LivingAttackEvent event) {
         if (event.getSource().getEntity() instanceof LivingEntity livingEntity) {

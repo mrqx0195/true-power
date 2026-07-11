@@ -1,5 +1,6 @@
 package net.mrqx.truepower.event.handler;
 
+import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.compat.playerAnim.VmdAnimation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -12,8 +13,8 @@ import net.mrqx.truepower.registry.TruePowerComboStateRegistry;
 import java.util.Map;
 
 @OnlyIn(Dist.CLIENT)
-public class PlayerAnimationRegistryHandler {
-    private static final ResourceLocation MOTION_LOCATION = new ResourceLocation("slashblade", "model/pa/player_motion.vmd");
+public final class PlayerAnimationRegistryHandler {
+    private static final ResourceLocation MOTION_LOCATION = SlashBlade.prefix("model/pa/player_motion.vmd");
     private static final PlayerAnimationRegistryHandler INSTANCE = new PlayerAnimationRegistryHandler();
     
     public static PlayerAnimationRegistryHandler getInstance() {

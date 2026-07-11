@@ -1,26 +1,19 @@
 package net.mrqx.truepower.util;
 
-import dev.kosmx.playerAnim.api.layered.AnimationStack;
-import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
+import mods.flammpfeil.slashblade.capability.slashblade.ISlashBladeState;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
-import mods.flammpfeil.slashblade.registry.ComboStateRegistry;
 import mods.flammpfeil.slashblade.registry.combo.ComboState;
 import mods.flammpfeil.slashblade.slasharts.SlashArts;
-import mods.flammpfeil.slashblade.util.AdvancementHelper;
-import mods.flammpfeil.slashblade.util.AttackManager;
-import mods.flammpfeil.slashblade.util.KnockBacks;
-import mods.flammpfeil.slashblade.util.TimeValueHelper;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
+import mods.flammpfeil.slashblade.util.*;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.mrqx.truepower.network.ComboSyncMessage;
+import net.mrqx.truepower.capability.data.ITruePowerData;
+import net.mrqx.truepower.config.TruePowerCommonConfig;
 
-import java.util.function.Consumer;
+import java.util.List;
 
 public class TruePowerComboHelper {
     public static final ComboState.TimeLineTickAction UPPER_SLASH = ComboState.TimeLineTickAction.getBuilder()
@@ -54,30 +47,48 @@ public class TruePowerComboHelper {
         }
     }
     
-    @OnlyIn(Dist.CLIENT)
-    public static Consumer<ComboSyncMessage> setClientCombo() {
-        return (msg) -> {
-            LocalPlayer player = Minecraft.getInstance().player;
-            if (player != null) {
-                if (msg.syncCombo) {
-                    ItemStack itemStack = player.getMainHandItem();
-                    if (itemStack.isEmpty()) {
-                        return;
-                    }
-                    itemStack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
-                        state.setComboSeq(msg.comboState);
-                        state.setLastActionTime(msg.lastActionTime);
-                        if (msg.comboState.equals(ComboStateRegistry.NONE.getId()) || msg.comboState.equals(ComboStateRegistry.STANDBY.getId())) {
-                            AnimationStack animationStack = PlayerAnimationAccess.getPlayerAnimLayer(player);
-                            animationStack.removeLayer(0);
-                        }
-                    });
-                }
-                player.getPersistentData().putString("truePower.combo", msg.comboState.toString());
-                player.getPersistentData().putBoolean("truePower.canMove", msg.canMove);
-                player.getPersistentData().putBoolean("truePower.jumpCancelOnly", msg.jumpCancelOnly);
-                player.getPersistentData().putBoolean("truePower.noMoveEnable", msg.noMoveEnable);
+    public static CollideAction getCollideAction(Entity entity, ISlashBladeState state) {
+        if (entity instanceof LivingEntity livingEntity) {
+            if (!entity.onGround()) {
+                return CollideAction.IGNORE;
             }
-        };
+            ITruePowerData data = ITruePowerData.get(livingEntity);
+            if (data != null) {
+                List<ITruePowerData.CollideInterval> intervals = data.getCollideIntervals();
+                if (intervals != null && !intervals.isEmpty()) {
+                    long elapsed = state.getElapsedTime(livingEntity);
+                    for (ITruePowerData.CollideInterval interval : intervals) {
+                        if (elapsed >= interval.start() && elapsed <= interval.end()) {
+                            return interval.action();
+                        }
+                    }
+                }
+            }
+        }
+        return TruePowerCommonConfig.COLLIDE_ACTION.get();
+    }
+    
+    public static boolean hasTargetOrSneak(LivingEntity entity) {
+        return entity.getCapability(ItemSlashBlade.INPUT_STATE).map(s -> s.getCommands(entity).contains(InputCommand.SNEAK)).orElse(false)
+            || hasTarget(entity);
+    }
+    
+    public static boolean hasTarget(LivingEntity entity) {
+        return hasTarget(entity, entity.getMainHandItem());
+    }
+    
+    public static boolean hasTarget(Entity entity, ItemStack stack) {
+        if (!stack.isEmpty()) {
+            ISlashBladeState state = stack.getCapability(ItemSlashBlade.BLADESTATE).resolve().orElse(null);
+            if (state != null) {
+                return hasTarget(entity, state);
+            }
+        }
+        return false;
+    }
+    
+    public static boolean hasTarget(Entity entity, ISlashBladeState state) {
+        Entity target = state.getTargetEntity(entity.level());
+        return target != null && target.isAlive();
     }
 }

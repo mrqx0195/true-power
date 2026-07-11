@@ -12,7 +12,7 @@ import net.mrqx.truepower.config.TruePowerClientConfig;
 
 @Mod.EventBusSubscriber(Dist.CLIENT)
 @OnlyIn(Dist.CLIENT)
-public class FovHandler {
+public final class FovHandler {
     @SubscribeEvent
     public static void onComputeFovModifierEvent(ComputeFovModifierEvent event) {
         Player player = event.getPlayer();

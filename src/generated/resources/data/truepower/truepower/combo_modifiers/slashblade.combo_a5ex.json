@@ -1,0 +1,22 @@
+{
+  "behavior": {
+    "cancelAction": {
+      "frame": 70,
+      "jumpOnly": false
+    },
+    "releaseActionQuickCharge": {
+      "chargeMax": 50,
+      "chargeMin": 30
+    },
+    "step": [
+      {
+        "distance": 3,
+        "tick": 14
+      }
+    ]
+  },
+  "end_frame": 1013,
+  "name": "slashblade.combo_a5ex",
+  "priority": 100,
+  "start_frame": 900
+}

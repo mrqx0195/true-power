@@ -1,0 +1,30 @@
+{
+  "behavior": {
+    "aerialRaveB3Multihit": {
+      "angle": 237,
+      "count": 4,
+      "damage": 0.4,
+      "startTick": 6
+    },
+    "cancelAction": {
+      "frame": -1,
+      "jumpOnly": false
+    },
+    "tickStun": [
+      {
+        "needPower": false,
+        "stunValue": 15,
+        "tick": 3
+      },
+      {
+        "needPower": false,
+        "stunValue": 15,
+        "tick": 6
+      }
+    ]
+  },
+  "end_frame": 1437,
+  "name": "slashblade.aerial_rave_b3",
+  "priority": 80,
+  "start_frame": 1400
+}

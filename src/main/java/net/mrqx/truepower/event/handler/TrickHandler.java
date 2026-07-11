@@ -25,6 +25,7 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.mrqx.sbr_core.utils.InputStream;
+import net.mrqx.truepower.capability.data.ITruePowerData;
 import net.mrqx.truepower.mixin.AccessorServerPlayer;
 import net.mrqx.truepower.util.JustSlashArtManager;
 
@@ -32,14 +33,14 @@ import java.util.EnumSet;
 import java.util.LinkedList;
 
 @Mod.EventBusSubscriber
-public class TrickHandler {
+public final class TrickHandler {
     static final int TRICK_UNTOUCHABLE_TIME = 10;
     
     private static final LinkedList<InputStream.TimeLineKeyInput> TRICK_DOWN_INPUT_TIME_LINE = new LinkedList<>();
     
     static {
-        TRICK_DOWN_INPUT_TIME_LINE.add(new InputStream.TimeLineKeyInput(3, 0, InputCommand.FORWARD, EnumSet.noneOf(InputCommand.class), InputStream.InputType.START));
-        TRICK_DOWN_INPUT_TIME_LINE.add(new InputStream.TimeLineKeyInput(3, 0, InputCommand.BACK, EnumSet.noneOf(InputCommand.class), InputStream.InputType.START));
+        TRICK_DOWN_INPUT_TIME_LINE.add(new InputStream.TimeLineKeyInput(5, 0, InputCommand.FORWARD, EnumSet.noneOf(InputCommand.class), InputStream.InputType.START));
+        TRICK_DOWN_INPUT_TIME_LINE.add(new InputStream.TimeLineKeyInput(5, 0, InputCommand.BACK, EnumSet.noneOf(InputCommand.class), InputStream.InputType.START));
     }
     
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -47,6 +48,7 @@ public class TrickHandler {
         EnumSet<InputCommand> old = event.getOld();
         EnumSet<InputCommand> current = event.getCurrent();
         ServerPlayer sender = event.getEntity();
+        ITruePowerData data = ITruePowerData.get(sender);
         ItemStack blade = sender.getMainHandItem();
         ISlashBladeState bladeState = blade.getCapability(ItemSlashBlade.BLADESTATE).orElse(new SlashBladeState(blade));
         
@@ -56,7 +58,7 @@ public class TrickHandler {
             || bladeState.isBroken()
             || bladeState.isSealed()
             || !SwordType.from(blade).contains(SwordType.BEWITCHED)
-            || (sender.getPersistentData().getInt("truepower.avoid.trick") > 0)) {
+            || (data != null && data.getAvoidTrick() > 0)) {
             return;
         }
         
@@ -67,56 +69,7 @@ public class TrickHandler {
             return;
         }
         
-        if (sender.onGround()) {
-            Untouchable.setUntouchable(sender, TRICK_UNTOUCHABLE_TIME);
-            
-            Vec3 input = new Vec3(0, 0, -1);
-            
-            sender.moveRelative(3.0f, input);
-            
-            Vec3 motion = maybeBackOffFromEdge(sender.getDeltaMovement(), sender);
-            
-            sender.playNotifySound(SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.5F, 1.2f);
-            
-            sender.move(MoverType.SELF, motion);
-            ((AccessorServerPlayer) sender).setIsChangingDimension(true);
-            
-            sender.connection.send(new ClientboundSetEntityMotionPacket(sender.getId(), motion.scale(0.5)));
-            
-            sender.getPersistentData().putInt("truepower.avoid.trick", 2);
-            
-            sender.getPersistentData().putInt(SlayerStyleArts.AVOID_COUNTER_PATH, 2);
-            NBTHelper.putVector3d(sender.getPersistentData(), SlayerStyleArts.AVOID_VEC_PATH, sender.position());
-            
-            JustSlashArtManager.resetJustCount(sender);
-            
-            AdvancementHelper.grantCriterion(sender, SlayerStyleArts.ADVANCEMENT_TRICK_DODGE);
-            
-            bladeState.updateComboSeq(sender, bladeState.getComboRoot());
-        } else {
-            Vec3 oldPos = sender.position();
-            Vec3 motion = new Vec3(0, -512, 0);
-            sender.move(MoverType.SELF, motion);
-            if (sender.onGround()) {
-                Untouchable.setUntouchable(sender, TRICK_UNTOUCHABLE_TIME);
-                ((AccessorServerPlayer) sender).setIsChangingDimension(true);
-                
-                sender.connection.send(new ClientboundSetEntityMotionPacket(sender.getId(), motion.scale(0.75)));
-                
-                sender.getPersistentData().putInt("truepower.avoid.trick", 2);
-                
-                sender.getPersistentData().putInt(SlayerStyleArts.AVOID_COUNTER_PATH, 2);
-                NBTHelper.putVector3d(sender.getPersistentData(), SlayerStyleArts.AVOID_VEC_PATH, sender.position());
-                
-                JustSlashArtManager.resetJustCount(sender);
-                bladeState.updateComboSeq(sender, ComboStateRegistry.NONE.getId());
-                
-                AdvancementHelper.grantCriterion(sender, SlayerStyleArts.ADVANCEMENT_TRICK_DOWN);
-                sender.playNotifySound(SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.5f, 1.2f);
-            } else {
-                sender.setPos(oldPos);
-            }
-        }
+        doTrickDown(sender, data, bladeState);
     }
     
     @SubscribeEvent(priority = EventPriority.LOW)
@@ -124,6 +77,7 @@ public class TrickHandler {
         EnumSet<InputCommand> old = event.getOld();
         EnumSet<InputCommand> current = event.getCurrent();
         ServerPlayer sender = event.getEntity();
+        ITruePowerData data = ITruePowerData.get(sender);
         ItemStack blade = sender.getMainHandItem();
         ISlashBladeState bladeState = blade.getCapability(ItemSlashBlade.BLADESTATE).orElse(new SlashBladeState(blade));
         CompoundTag persistentData = sender.getPersistentData();
@@ -132,9 +86,9 @@ public class TrickHandler {
             || bladeState.isBroken()
             || bladeState.isSealed()
             || !SwordType.from(blade).contains(SwordType.BEWITCHED)
-            || (persistentData.getInt("truepower.avoid.trick") > 0)
+            || (data != null && data.getAvoidTrick() > 0)
             || (persistentData.getInt(SlayerStyleArts.AVOID_TRICKUP_PATH) > 0)
-            || (!persistentData.getBoolean("truePower.canMove"))) {
+            || (data != null && !data.canMove())) {
             return;
         }
         
@@ -170,16 +124,85 @@ public class TrickHandler {
             return;
         }
         
-        if (event.player.getPersistentData().getInt("truepower.avoid.trick") > 0) {
-            int count = event.player.getPersistentData().getInt("truepower.avoid.trick");
-            count--;
-            if (count <= 0) {
-                event.player.getPersistentData().remove("truepower.avoid.trick");
-                if (event.player instanceof ServerPlayer) {
-                    ((ServerPlayer) event.player).hasChangedDimension();
+        ITruePowerData data = ITruePowerData.get(event.player);
+        if (data == null || data.getAvoidTrick() <= 0) {
+            return;
+        }
+        
+        int count = data.getAvoidTrick() - 1;
+        data.setAvoidTrick(count);
+        if (count <= 0 && event.player instanceof ServerPlayer serverPlayer) {
+            serverPlayer.hasChangedDimension();
+            if (data.isTrickDowning()) {
+                if (serverPlayer.getCapability(ItemSlashBlade.INPUT_STATE)
+                    .map(s -> s.getCommands(serverPlayer).contains(InputCommand.SPRINT)).orElse(false)) {
+                    if (InputStream.getOrCreateInputStream(serverPlayer)
+                        .checkInputWithRangedTime(InputCommand.SPRINT, InputStream.InputType.START, Integer.MAX_VALUE, 10)) {
+                        ItemStack blade = serverPlayer.getMainHandItem();
+                        doTrickDown(serverPlayer, data, blade.getCapability(ItemSlashBlade.BLADESTATE).orElse(new SlashBladeState(blade)));
+                    }
+                } else {
+                    data.setTrickDowning(false);
                 }
+            }
+        }
+    }
+    
+    public static void doTrickDown(ServerPlayer sender, ITruePowerData data, ISlashBladeState bladeState) {
+        if (sender.onGround()) {
+            Untouchable.setUntouchable(sender, TRICK_UNTOUCHABLE_TIME);
+            
+            Vec3 input = new Vec3(0, 0, -1);
+            
+            sender.moveRelative(3.0f, input);
+            
+            Vec3 motion = maybeBackOffFromEdge(sender.getDeltaMovement(), sender);
+            
+            sender.playNotifySound(SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.5F, 1.2f);
+            
+            sender.move(MoverType.SELF, motion);
+            ((AccessorServerPlayer) sender).setIsChangingDimension(true);
+            
+            sender.connection.send(new ClientboundSetEntityMotionPacket(sender.getId(), motion.scale(0.5)));
+            
+            if (data != null) {
+                data.setAvoidTrick(2);
+                data.setTrickDowning(true);
+            }
+            
+            sender.getPersistentData().putInt(SlayerStyleArts.AVOID_COUNTER_PATH, 2);
+            NBTHelper.putVector3d(sender.getPersistentData(), SlayerStyleArts.AVOID_VEC_PATH, sender.position());
+            
+            JustSlashArtManager.resetJustCount(sender);
+            
+            AdvancementHelper.grantCriterion(sender, SlayerStyleArts.ADVANCEMENT_TRICK_DODGE);
+            
+            bladeState.updateComboSeq(sender, bladeState.getComboRoot());
+        } else {
+            Vec3 oldPos = sender.position();
+            Vec3 motion = new Vec3(0, -512, 0);
+            sender.move(MoverType.SELF, motion);
+            if (sender.onGround()) {
+                Untouchable.setUntouchable(sender, TRICK_UNTOUCHABLE_TIME);
+                ((AccessorServerPlayer) sender).setIsChangingDimension(true);
+                
+                sender.connection.send(new ClientboundSetEntityMotionPacket(sender.getId(), motion.scale(0.75)));
+                
+                if (data != null) {
+                    data.setAvoidTrick(2);
+                    data.setTrickDowning(true);
+                }
+                
+                sender.getPersistentData().putInt(SlayerStyleArts.AVOID_COUNTER_PATH, 2);
+                NBTHelper.putVector3d(sender.getPersistentData(), SlayerStyleArts.AVOID_VEC_PATH, sender.position());
+                
+                JustSlashArtManager.resetJustCount(sender);
+                bladeState.updateComboSeq(sender, ComboStateRegistry.NONE.getId());
+                
+                AdvancementHelper.grantCriterion(sender, SlayerStyleArts.ADVANCEMENT_TRICK_DOWN);
+                sender.playNotifySound(SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.5f, 1.2f);
             } else {
-                event.player.getPersistentData().putInt("truepower.avoid.trick", count);
+                sender.setPos(oldPos);
             }
         }
     }

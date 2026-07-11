@@ -1,0 +1,29 @@
+{
+  "behavior": {
+    "cancelAction": {
+      "frame": 10,
+      "jumpOnly": true
+    },
+    "tickStun": [
+      {
+        "needPower": false,
+        "stunValue": 20,
+        "tick": 0
+      },
+      {
+        "needPower": false,
+        "stunValue": 20,
+        "tick": 1
+      },
+      {
+        "needPower": false,
+        "stunValue": 20,
+        "tick": 2
+      }
+    ]
+  },
+  "end_frame": 55,
+  "name": "slashblade.piercing_2",
+  "priority": 50,
+  "start_frame": 33
+}

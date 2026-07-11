@@ -7,7 +7,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber
-public class LivingJumpEventHandler {
+public final class LivingJumpEventHandler {
     @SubscribeEvent
     public static void onPlayerJump(LivingEvent.LivingJumpEvent event) {
         event.getEntity().getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> state.updateComboSeq(event.getEntity(), ComboStateRegistry.NONE.getId()));

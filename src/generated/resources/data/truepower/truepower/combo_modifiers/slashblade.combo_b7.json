@@ -1,0 +1,83 @@
+{
+  "behavior": {
+    "cancelAction": {
+      "frame": 15,
+      "jumpOnly": true
+    },
+    "releaseActionQuickCharge": {
+      "charge": 15
+    },
+    "step": [
+      {
+        "distance": 1.5,
+        "tick": 0
+      }
+    ],
+    "tickStun": [
+      {
+        "needPower": false,
+        "stunValue": 1,
+        "tick": 0
+      },
+      {
+        "needPower": false,
+        "stunValue": 1,
+        "tick": 1
+      },
+      {
+        "needPower": false,
+        "stunValue": 1,
+        "tick": 2
+      },
+      {
+        "needPower": false,
+        "stunValue": 1,
+        "tick": 3
+      },
+      {
+        "needPower": false,
+        "stunValue": 1,
+        "tick": 4
+      },
+      {
+        "needPower": false,
+        "stunValue": 1,
+        "tick": 5
+      },
+      {
+        "needPower": false,
+        "stunValue": 1,
+        "tick": 6
+      },
+      {
+        "needPower": false,
+        "stunValue": 1,
+        "tick": 7
+      },
+      {
+        "needPower": false,
+        "stunValue": 50,
+        "tick": 12
+      },
+      {
+        "needPower": true,
+        "stunValue": 20,
+        "tick": 12
+      },
+      {
+        "needPower": false,
+        "stunValue": 50,
+        "tick": 13
+      },
+      {
+        "needPower": true,
+        "stunValue": 20,
+        "tick": 13
+      }
+    ]
+  },
+  "end_frame": 764,
+  "name": "slashblade.combo_b7",
+  "priority": 100,
+  "start_frame": 710
+}

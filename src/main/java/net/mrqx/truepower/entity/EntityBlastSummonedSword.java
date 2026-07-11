@@ -1,6 +1,5 @@
 package net.mrqx.truepower.entity;
 
-import mods.flammpfeil.slashblade.ability.StunManager;
 import mods.flammpfeil.slashblade.entity.EntityAbstractSummonedSword;
 import mods.flammpfeil.slashblade.entity.Projectile;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
@@ -18,6 +17,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PlayMessages;
 import net.mrqx.truepower.TruePowerMod;
+import net.mrqx.truepower.capability.stun.ITruePowerStunData;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -52,6 +52,9 @@ public class EntityBlastSummonedSword extends EntityAbstractSummonedSword {
             List<LivingEntity> summonList = new ArrayList<>(preSummonSwordList);
             summonList.forEach(target -> {
                 Level level = target.level();
+                if (!level.equals(owner.level())) {
+                    return;
+                }
                 Vec3 targetPos = target.getEyePosition();
                 float radius = (count > 1) ? (count - 1) / 5.0f : 0.0f;
                 for (int i = 0; i < count; i++) {
@@ -112,8 +115,11 @@ public class EntityBlastSummonedSword extends EntityAbstractSummonedSword {
     public void burst(List<MobEffectInstance> effects, @Nullable Entity focusEntity) {
         List<Entity> list = TargetSelector.getTargettableEntitiesWithinAABB(this.level(), 2.0F, this);
         this.setDamage(this.getBurstDamage());
-        list.stream().filter((e) -> e instanceof LivingEntity).map((e) -> (LivingEntity) e).forEach(livingEntity -> {
-            StunManager.setStun(livingEntity);
+        list.stream().filter(e -> e instanceof LivingEntity).map(e -> (LivingEntity) e).forEach(livingEntity -> {
+            ITruePowerStunData stunData = ITruePowerStunData.get(livingEntity);
+            if (stunData != null) {
+                stunData.triggerStun(60);
+            }
             livingEntity.setDeltaMovement(0, livingEntity.getDeltaMovement().y >= 1 ? livingEntity.getDeltaMovement().y + 0.05 : 1, 0);
         });
         super.burst(effects, focusEntity);

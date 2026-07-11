@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(EntityHeavyRainSwords.class)
-public class MixinEntityHeavyRainSwords {
+public abstract class MixinEntityHeavyRainSwords {
     @WrapOperation(method = "rideTick()V",
         at = @At(value = "INVOKE", target = "Lmods/flammpfeil/slashblade/entity/EntityHeavyRainSwords;itFired()Z", ordinal = 1),
         remap = false

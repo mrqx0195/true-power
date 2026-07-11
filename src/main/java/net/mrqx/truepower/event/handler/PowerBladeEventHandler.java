@@ -9,12 +9,12 @@ import net.minecraftforge.fml.common.Mod;
 import net.mrqx.truepower.config.TruePowerCommonConfig;
 
 @Mod.EventBusSubscriber
-public class PowerBladeEventHandler {
+public final class PowerBladeEventHandler {
     @SubscribeEvent
     public static void onPowerBladeEvent(SlashBladeEvent.PowerBladeEvent event) {
         LivingEntity entity = event.getUser();
         if (!event.isPowered() &&
-                event.getBlade().getCapability(ItemSlashBlade.BLADESTATE).isPresent()) {
+            event.getBlade().getCapability(ItemSlashBlade.BLADESTATE).isPresent()) {
             entity.getCapability(CapabilityConcentrationRank.RANK_POINT).ifPresent((cr) -> {
                 if (cr.getRankPoint(entity.level().getGameTime()) >= TruePowerCommonConfig.POWERED_RANK_REQUIRE.get()) {
                     event.setPowered(true);

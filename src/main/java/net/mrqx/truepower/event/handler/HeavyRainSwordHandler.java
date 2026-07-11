@@ -25,15 +25,15 @@ import java.util.EnumSet;
 import java.util.LinkedList;
 
 @Mod.EventBusSubscriber
-public class HeavyRainSwordHandler {
+public final class HeavyRainSwordHandler {
     private static final LinkedList<InputStream.TimeLineKeyInput> HEAVY_RAIN_SWORD_TIME_LINE = new LinkedList<>();
-
+    
     static {
-        HEAVY_RAIN_SWORD_TIME_LINE.add(new InputStream.TimeLineKeyInput(3, 0, InputCommand.FORWARD, EnumSet.noneOf(InputCommand.class), InputStream.InputType.START));
-        HEAVY_RAIN_SWORD_TIME_LINE.add(new InputStream.TimeLineKeyInput(3, 0, InputCommand.BACK, EnumSet.noneOf(InputCommand.class), InputStream.InputType.START));
+        HEAVY_RAIN_SWORD_TIME_LINE.add(new InputStream.TimeLineKeyInput(5, -2, InputCommand.FORWARD, EnumSet.noneOf(InputCommand.class), InputStream.InputType.START));
+        HEAVY_RAIN_SWORD_TIME_LINE.add(new InputStream.TimeLineKeyInput(7, -2, InputCommand.BACK, EnumSet.noneOf(InputCommand.class), InputStream.InputType.START));
     }
-
-
+    
+    
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void heavyRainSword(InputCommandEvent event) {
         EnumSet<InputCommand> old = event.getOld();
@@ -42,39 +42,39 @@ public class HeavyRainSwordHandler {
         ItemStack blade = entity.getMainHandItem();
         ISlashBladeState bladeState = blade.getCapability(ItemSlashBlade.BLADESTATE).orElse(new SlashBladeState(blade));
         final int powerLevel = blade.getEnchantmentLevel(Enchantments.POWER_ARROWS);
-
+        
         InputStream inputStream = InputStream.getOrCreateInputStream(entity);
-
+        
         if (bladeState.isBroken()
-                || bladeState.isSealed()
-                || !SwordType.from(blade).contains(SwordType.BEWITCHED)) {
+            || bladeState.isSealed()
+            || !SwordType.from(blade).contains(SwordType.BEWITCHED)) {
             return;
         }
-
+        
         boolean onDown = !old.contains(InputCommand.M_DOWN) && current.contains(InputCommand.M_DOWN)
-                && inputStream.checkTimeLineInput(HEAVY_RAIN_SWORD_TIME_LINE);
-
+            && inputStream.checkTimeLineInput(HEAVY_RAIN_SWORD_TIME_LINE);
+        
         if (!onDown) {
             return;
         }
         Level worldIn = entity.level();
         int rank = entity.getCapability(CapabilityConcentrationRank.RANK_POINT)
-                .map(r -> r.getRank(worldIn.getGameTime()).level).orElse(0);
+            .map(r -> r.getRank(worldIn.getGameTime()).level).orElse(0);
         int count = 9 + Math.min(rank - 1, 0);
-
+        
         entity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
-
             Entity target = state.getTargetEntity(worldIn);
-            if (state.getProudSoulCount() < SlashBladeConfig.SUMMON_SWORD_ART_COST.get()) {
-                return;
+            if (target != null) {
+                if (state.getProudSoulCount() < SlashBladeConfig.SUMMON_SWORD_ART_COST.get()) {
+                    return;
+                }
+                state.setProudSoulCount(state.getProudSoulCount() - SlashBladeConfig.SUMMON_SWORD_ART_COST.get());
+                
+                MrqxSummonedSwordArts.HEAVY_RAIN_SWORD.accept(entity, target, (double) powerLevel, count);
             }
-            state.setProudSoulCount(state.getProudSoulCount() - SlashBladeConfig.SUMMON_SWORD_ART_COST.get());
-
-            MrqxSummonedSwordArts.HEAVY_RAIN_SWORD.accept(entity, target, (double) powerLevel, count);
         });
-
     }
-
+    
     private static Vec3 calculateViewVector(float x, float y) {
         float f = x * ((float) Math.PI / 180F);
         float f1 = -y * ((float) Math.PI / 180F);

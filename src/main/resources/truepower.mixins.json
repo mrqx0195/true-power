@@ -1,11 +1,14 @@
 {
   "client": [
+    "MixinInput",
     "MixinLocalPlayer",
-    "MixinLockOnManager"
+    "MixinLockOnManager",
+    "MixinMinecraft"
   ],
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "mixins": [
+    "AccessorReloadableResourceManager",
     "AccessorServerPlayer",
     "MixinAdvancementHelper",
     "MixinAttackManager",
@@ -13,14 +16,17 @@
     "MixinComboStateRegistry",
     "MixinConcentrationRank",
     "MixinConcentrationRanks",
+    "MixinEntity",
     "MixinEntityAbstractSummonedSword",
     "MixinEntityHeavyRainSwords",
+    "MixinEntitySlashEffect",
+    "MixinInventory",
     "MixinJudgementCut",
+    "MixinLivingEntity",
     "MixinPlayer",
     "MixinRankPointHandler",
     "MixinSlashArts",
     "MixinSlayerStyleArts",
-    "MixinStunGoal",
     "MixinSummonedSwordArts"
   ],
   "package": "net.mrqx.truepower.mixin",

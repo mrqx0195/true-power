@@ -11,20 +11,21 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.mrqx.truepower.event.TruePowerStunEvent;
 
 import java.util.UUID;
 
 @Mod.EventBusSubscriber
-public class PoweredBonusHandler {
+public final class PoweredBonusHandler {
     @SubscribeEvent
     public static void onTick(LivingEvent.LivingTickEvent event) {
         LivingEntity livingEntity = event.getEntity();
         boolean isPowered = AttackManager.isPowered(livingEntity);
-
+        
         AttributeModifier poweredBonus = new AttributeModifier(
-                UUID.fromString("1340d4b5-b4fa-49a0-ad4e-f55f7dae03fe"),
-                "Powered Bonus", 1.15 - 1, AttributeModifier.Operation.MULTIPLY_TOTAL);
-
+            UUID.fromString("1340d4b5-b4fa-49a0-ad4e-f55f7dae03fe"),
+            "Powered Bonus", 1.15 - 1, AttributeModifier.Operation.MULTIPLY_TOTAL);
+        
         AttributeInstance attributeInstance = livingEntity.getAttribute(ModAttributes.getSlashBladeDamage());
         if (attributeInstance == null) {
             return;
@@ -33,7 +34,7 @@ public class PoweredBonusHandler {
         if (isPowered) {
             attributeInstance.addPermanentModifier(poweredBonus);
         }
-
+        
         livingEntity.getCapability(ConcentrationRankCapabilityProvider.RANK_POINT).ifPresent(rank -> {
             double amount;
             if (rank.getRank(livingEntity.level().getGameTime()).level > IConcentrationRank.ConcentrationRanks.SS.level) {
@@ -55,22 +56,32 @@ public class PoweredBonusHandler {
                     amount = 1;
                 }
             }
-
+            
             AttributeModifier concentrationBonus = new AttributeModifier(
-                    UUID.fromString("9cc4973f-1a68-4775-9dc7-65f205bce8b3"),
-                    "Concentration Bonus", amount - 1, AttributeModifier.Operation.MULTIPLY_TOTAL);
-
+                UUID.fromString("9cc4973f-1a68-4775-9dc7-65f205bce8b3"),
+                "Concentration Bonus", amount - 1, AttributeModifier.Operation.MULTIPLY_TOTAL);
+            
             attributeInstance.removeModifier(concentrationBonus);
             if (amount != 1) {
                 attributeInstance.addPermanentModifier(concentrationBonus);
             }
         });
     }
-
+    
     @SubscribeEvent
     public static void onLivingHurtEvent(LivingHurtEvent event) {
         if (AttackManager.isPowered(event.getEntity())) {
             event.setAmount(event.getAmount() * 0.5F);
+        }
+    }
+    
+    @SubscribeEvent
+    public static void onAddStunValue(TruePowerStunEvent.AddStunValue event) {
+        if (event.getSource() != null && AttackManager.isPowered(event.getSource())) {
+            event.setAdditionValue(event.getAdditionValue() * 1.2F);
+        }
+        if (AttackManager.isPowered(event.getEntity())) {
+            event.setAdditionValue(event.getAdditionValue() * 0.75F);
         }
     }
 }

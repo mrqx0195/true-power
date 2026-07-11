@@ -39,6 +39,10 @@ repositories {
     }
 
     maven {
+        url 'https://jitpack.io'
+    }
+
+    maven {
         name "KosmX's maven"
         url 'https://maven.kosmx.dev/'
     }
@@ -46,6 +50,20 @@ repositories {
     maven {
         name = "ModMaven"
         url = "https://modmaven.dev"
+    }
+
+    maven {
+        url = "https://maven.architectury.dev"
+        content {
+            includeGroup "dev.architectury"
+        }
+    }
+    maven {
+        url "https://maven.latvian.dev/releases"
+        content {
+            includeGroup "dev.latvian.mods"
+            includeGroup "dev.latvian.apps"
+        }
     }
 
     flatDir {
@@ -117,9 +135,14 @@ obfuscation {
 }
 
 dependencies {
-    modImplementation "maven.modrinth:slashblade-resharped:${slash_blade_version}"
+    modImplementation 'com.github.0999312:SlashBlade_Resharped:6e2a0a092f'
     modImplementation "blank:mrqxs_Slashblade_Core-${minecraft_version}:${mrqx_slash_blade_core_version}"
     modImplementation "dev.kosmx.player-anim:player-animation-lib-forge:${player_animation_version}"
+
+    modImplementation "maven.modrinth:shoulder-surfing-reloaded:1.20.1-5.0.2+forge"
+    modImplementation "dev.latvian.mods:kubejs-forge:2001.6.5-build.16"
+    modImplementation "dev.latvian.mods:rhino-forge:2001.2.3-build.10"
+    modImplementation "dev.architectury:architectury-forge:9.2.14"
 
     modRuntimeOnly "maven.modrinth:moonlight:1.20-2.16.13-forge"
     modRuntimeOnly "maven.modrinth:mmmmmmmmmmmm:1.20-2.0.9"
@@ -132,6 +155,7 @@ dependencies {
 mixin {
     add sourceSets.main, "${mod_id}.refmap.json"
     config "${mod_id}.mixins.json"
+    config "${mod_id}.shouldersurfing.mixins.json"
 }
 
 dependencies {
@@ -140,7 +164,7 @@ dependencies {
 
 jar {
     manifest.attributes([
-            "MixinConfigs": "${mod_id}.mixins.json"
+            "MixinConfigs": "${mod_id}.mixins.json, ${mod_id}.shouldersurfing.mixins.json"
     ])
 }
 

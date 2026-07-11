@@ -7,6 +7,7 @@ import mods.flammpfeil.slashblade.event.handler.InputCommandEvent;
 import mods.flammpfeil.slashblade.util.InputCommand;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
+import net.mrqx.truepower.capability.data.ITruePowerData;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -53,7 +54,8 @@ public abstract class MixinSlayerStyleArts {
         at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;onGround()Z", ordinal = 1)
     )
     private boolean wrapOperationTrickDodge(ServerPlayer instance, Operation<Boolean> original) {
-        return instance.getPersistentData().getBoolean("truePower.canMove") && original.call(instance);
+        ITruePowerData data = ITruePowerData.get(instance);
+        return (data == null || data.canMove()) && original.call(instance);
     }
     
     @Inject(
@@ -63,7 +65,8 @@ public abstract class MixinSlayerStyleArts {
     )
     private void injectAllTrick(InputCommandEvent event, CallbackInfo ci) {
         ServerPlayer sender = event.getEntity();
-        if (sender.getPersistentData().getInt("truepower.avoid.trick") > 0) {
+        ITruePowerData data = ITruePowerData.get(sender);
+        if (data != null && data.getAvoidTrick() > 0) {
             ci.cancel();
         }
     }
