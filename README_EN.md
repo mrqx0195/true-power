@@ -60,7 +60,8 @@ This mod comprehensively replaces and rewrites Resharped's combat system to purs
 - **Trick Up** binding changed to: Press **Special Move** key *without* directional input.
 - **Heavy Rain Swords** binding changed to: Sneak + (Back → Forward) + Press **Summon Mirage Blade** key *(Detection
   similar to DMC5)*.
-- **Trick Down** binding changed to: Sneak + (Back → Forward) + Press **Special Move** key *(Detection similar to DMC5)*.
+- **Trick Down** binding changed to: Sneak + (Back → Forward) + Press **Special Move** key *(Detection similar to
+  DMC5)*.
     - *(v1.2.0+)* Holding down the **Special Move** key will automatically trigger consecutive Tricks.
 - *(v1.2.0+)* Input windows for all Back → Forward inputs have been significantly expanded.
 - *(v1.2.0+)* While locking on, the mouse wheel can be used to cycle through lock-on targets.
@@ -85,9 +86,9 @@ This mod comprehensively replaces and rewrites Resharped's combat system to purs
 
 # Compatibility Features
 
-## *(v1.2.0+)* Shoulder Surfing Reloaded
+## *(v1.2.0+)* [Shoulder Surfing Reloaded](https://modrinth.com/mod/shoulder-surfing-reloaded)
 
-*(The following are special behaviors when using Shoulder Surfing Reloaded)*
+*(The following are special behaviors when using Shoulder Surfing)*
 
 - While holding a SlashBlade, automatic camera rotation is disabled in most situations.
 - Movement input handling has been modified: for combo key press detection, inputs are rotated according to the player
