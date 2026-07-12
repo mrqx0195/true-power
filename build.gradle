@@ -51,6 +51,14 @@ repositories {
         url 'https://maven.kosmx.dev/'
     }
 
+    maven {
+        url "https://maven.latvian.dev/releases"
+        content {
+            includeGroup "dev.latvian.mods"
+            includeGroup "dev.latvian.apps"
+        }
+    }
+
     flatDir {
         dir 'libs'
     }
@@ -121,6 +129,10 @@ dependencies {
     implementation 'com.github.0999312:SlashBlade_Resharped:1.21.1-SNAPSHOT'
     implementation "blank:mrqxs_Slashblade_Core-${minecraft_version}:${mrqx_slash_blade_core_version}"
     implementation "dev.kosmx.player-anim:player-animation-lib-forge:${player_animation_version}"
+
+    implementation "maven.modrinth:shoulder-surfing-reloaded:1.21.1-5.0.5+neoforge"
+    implementation "dev.latvian.mods:kubejs-neoforge:2101.7.2-build.368"
+    implementation "dev.latvian.mods:rhino:2101.2.7-build.85"
 
     runtimeOnly "maven.modrinth:moonlight:UG29KBvQ"
     runtimeOnly "maven.modrinth:mmmmmmmmmmmm:1.21-2.0.12-neoforge"
