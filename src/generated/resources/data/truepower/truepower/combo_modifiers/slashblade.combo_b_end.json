@@ -1,0 +1,43 @@
+{
+  "behavior": {
+    "cancelAction": {
+      "frame": 12,
+      "jumpOnly": true
+    },
+    "releaseActionQuickCharge": {
+      "charge": 12
+    },
+    "step": [
+      {
+        "distance": 1.5,
+        "tick": 10
+      }
+    ],
+    "tickStun": [
+      {
+        "needPower": false,
+        "stunValue": 50,
+        "tick": 9
+      },
+      {
+        "needPower": true,
+        "stunValue": 20,
+        "tick": 9
+      },
+      {
+        "needPower": false,
+        "stunValue": 50,
+        "tick": 10
+      },
+      {
+        "needPower": true,
+        "stunValue": 20,
+        "tick": 10
+      }
+    ]
+  },
+  "end_frame": 743,
+  "name": "slashblade.combo_b_end",
+  "priority": 100,
+  "start_frame": 720
+}

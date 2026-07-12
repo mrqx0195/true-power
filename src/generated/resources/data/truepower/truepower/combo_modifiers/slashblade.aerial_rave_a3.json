@@ -1,0 +1,12 @@
+{
+  "behavior": {
+    "cancelAction": {
+      "frame": -1,
+      "jumpOnly": false
+    }
+  },
+  "end_frame": 1328,
+  "name": "slashblade.aerial_rave_a3",
+  "priority": 80,
+  "start_frame": 1300
+}

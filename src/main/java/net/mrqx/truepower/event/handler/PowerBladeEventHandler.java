@@ -9,7 +9,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 
 @EventBusSubscriber
-public class PowerBladeEventHandler {
+public final class PowerBladeEventHandler {
     @SubscribeEvent
     public static void onPowerBladeEvent(SlashBladeEvent.PowerBladeEvent event) {
         LivingEntity entity = event.getUser();

@@ -6,13 +6,14 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 @EventBusSubscriber
-public class NetworkManager {
+public final class NetworkManager {
     private static final String PROTOCOL_VERSION = "1";
     
     @SubscribeEvent
     public static void onRegisterPayloadHandlersEvent(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar registrar = event.registrar(PROTOCOL_VERSION);
         registrar.playToServer(ComboCancelMessage.TYPE, ComboCancelMessage.STREAM_CODEC, ComboCancelMessage::handle);
+        registrar.playToServer(LockOnTargetChangeMessage.TYPE, LockOnTargetChangeMessage.STREAM_CODEC, LockOnTargetChangeMessage::handle);
         registrar.playToClient(ComboSyncMessage.TYPE, ComboSyncMessage.STREAM_CODEC, ComboSyncMessage::handle);
     }
 }

@@ -1,15 +1,15 @@
 package net.mrqx.truepower.network;
 
 import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
-import mods.flammpfeil.slashblade.capability.slashblade.ISlashBladeState;
 import mods.flammpfeil.slashblade.registry.ComboStateRegistry;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.mrqx.truepower.TruePowerMod;
+import net.mrqx.truepower.attachment.ITruePowerData;
 import net.mrqx.truepower.event.ComboCancelEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -40,22 +40,22 @@ public record ComboCancelMessage(boolean isJump) implements CustomPacketPayload 
                 ComboCancelEvent event = new ComboCancelEvent(serverPlayer.getMainHandItem(), state, serverPlayer, msg.isJump());
                 if (!NeoForge.EVENT_BUS.post(event).isCanceled()) {
                     state.updateComboSeq(serverPlayer, ComboStateRegistry.NONE.getId());
-                    ComboSyncMessage comboSyncMessage = getComboSyncMessage(serverPlayer, state);
+                    
+                    ResourceLocation noneId = ComboStateRegistry.NONE.getId();
+                    state.updateComboSeq(serverPlayer, noneId);
+                    ITruePowerData data = ITruePowerData.get(serverPlayer);
+                    ComboSyncMessage comboSyncMessage = new ComboSyncMessage(
+                        noneId,
+                        state.getLastActionTime(),
+                        data.canMove(),
+                        data.isJumpCancelOnly(),
+                        data.isNoMoveEnable(),
+                        true
+                    );
+                    
                     PacketDistributor.sendToPlayer(serverPlayer, comboSyncMessage);
                 }
             });
         }
-    }
-    
-    private static ComboSyncMessage getComboSyncMessage(ServerPlayer serverPlayer, ISlashBladeState state) {
-        CompoundTag persistentData = serverPlayer.getPersistentData();
-        return new ComboSyncMessage(
-            ComboStateRegistry.NONE.getId(),
-            state.getLastActionTime(),
-            persistentData.getBoolean("truePower.canMove"),
-            persistentData.getBoolean("truePower.jumpCancelOnly"),
-            persistentData.getBoolean("truePower.noMoveEnable"),
-            true
-        );
     }
 }

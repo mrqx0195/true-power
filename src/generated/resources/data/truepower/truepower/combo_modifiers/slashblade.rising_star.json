@@ -1,0 +1,23 @@
+{
+  "behavior": {
+    "cancelAction": {
+      "frame": -1,
+      "jumpOnly": false
+    },
+    "jumpVelocityBoost": {
+      "duration": 3,
+      "multiplier": 1.1
+    },
+    "tickStun": [
+      {
+        "needPower": false,
+        "stunValue": 20,
+        "tick": 6
+      }
+    ]
+  },
+  "end_frame": 2137,
+  "name": "slashblade.rising_star",
+  "priority": 80,
+  "start_frame": 2100
+}

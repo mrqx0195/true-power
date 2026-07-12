@@ -1,0 +1,49 @@
+{
+  "behavior": {
+    "cancelAction": {
+      "frame": -1,
+      "jumpOnly": false
+    },
+    "tickStun": [
+      {
+        "needPower": false,
+        "stunValue": 1,
+        "tick": 0
+      },
+      {
+        "needPower": false,
+        "stunValue": 1,
+        "tick": 1
+      },
+      {
+        "needPower": false,
+        "stunValue": 1,
+        "tick": 2
+      },
+      {
+        "needPower": false,
+        "stunValue": 1,
+        "tick": 3
+      },
+      {
+        "needPower": false,
+        "stunValue": 1,
+        "tick": 4
+      },
+      {
+        "needPower": false,
+        "stunValue": 1,
+        "tick": 5
+      },
+      {
+        "needPower": false,
+        "stunValue": 1,
+        "tick": 6
+      }
+    ]
+  },
+  "end_frame": 720,
+  "name": "slashblade.combo_b2",
+  "priority": 100,
+  "start_frame": 710
+}

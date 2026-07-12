@@ -1,4 +1,4 @@
-package net.mrqx.truepower.event.handler.combo;
+package net.mrqx.truepower.combo;
 
 import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.util.InputCommand;
@@ -13,8 +13,8 @@ public class VoidSlashHandler {
     private static final LinkedList<InputStream.TimeLineKeyInput> VOID_SLASH_INPUT_TIME_LINE = new LinkedList<>();
     
     static {
-        VOID_SLASH_INPUT_TIME_LINE.add(new InputStream.TimeLineKeyInput(4, 0, InputCommand.FORWARD, EnumSet.noneOf(InputCommand.class), InputStream.InputType.START));
-        VOID_SLASH_INPUT_TIME_LINE.add(new InputStream.TimeLineKeyInput(4, 0, InputCommand.BACK, EnumSet.noneOf(InputCommand.class), InputStream.InputType.START));
+        VOID_SLASH_INPUT_TIME_LINE.add(new InputStream.TimeLineKeyInput(5, -2, InputCommand.FORWARD, EnumSet.noneOf(InputCommand.class), InputStream.InputType.START));
+        VOID_SLASH_INPUT_TIME_LINE.add(new InputStream.TimeLineKeyInput(7, -2, InputCommand.BACK, EnumSet.noneOf(InputCommand.class), InputStream.InputType.START));
     }
     
     public static boolean doVoidSlash(LivingEntity livingEntity, EnumSet<InputCommand> commands) {

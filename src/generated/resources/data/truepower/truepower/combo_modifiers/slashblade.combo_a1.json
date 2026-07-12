@@ -1,0 +1,18 @@
+{
+  "behavior": {
+    "cancelAction": {
+      "frame": 2,
+      "jumpOnly": true
+    },
+    "step": [
+      {
+        "distance": 0.5,
+        "tick": 0
+      }
+    ]
+  },
+  "end_frame": 10,
+  "name": "slashblade.combo_a1",
+  "priority": 100,
+  "start_frame": 1
+}

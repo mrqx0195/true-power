@@ -1,16 +1,20 @@
 package net.mrqx.truepower.util;
 
+import mods.flammpfeil.slashblade.capability.inputstate.CapabilityInputState;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
+import mods.flammpfeil.slashblade.capability.slashblade.ISlashBladeState;
 import mods.flammpfeil.slashblade.registry.combo.ComboState;
 import mods.flammpfeil.slashblade.slasharts.SlashArts;
-import mods.flammpfeil.slashblade.util.AdvancementHelper;
-import mods.flammpfeil.slashblade.util.AttackManager;
-import mods.flammpfeil.slashblade.util.KnockBacks;
-import mods.flammpfeil.slashblade.util.TimeValueHelper;
+import mods.flammpfeil.slashblade.util.*;
 import net.minecraft.core.Holder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.phys.Vec3;
+import net.mrqx.truepower.attachment.ITruePowerData;
+import net.mrqx.truepower.config.TruePowerCommonConfig;
 
 public class TruePowerComboHelper {
     public static final ComboState.TimeLineTickAction UPPER_SLASH = ComboState.TimeLineTickAction.getBuilder()
@@ -44,5 +48,48 @@ public class TruePowerComboHelper {
         } else {
             return SlashArts.ArtsType.Fail;
         }
+    }
+    
+    public static CollideAction getCollideAction(Entity entity, ISlashBladeState state) {
+        if (!entity.onGround()) {
+            return CollideAction.IGNORE;
+        }
+        if (entity instanceof LivingEntity living) {
+            ITruePowerData data = ITruePowerData.get(living);
+            var intervals = data.getCollideIntervals();
+            if (intervals != null) {
+                long comboTime = state.getLastActionTime();
+                for (var interval : intervals) {
+                    if (comboTime >= interval.start() && comboTime <= interval.end()) {
+                        return interval.action();
+                    }
+                }
+            }
+        }
+        return TruePowerCommonConfig.COLLIDE_ACTION.get();
+    }
+    
+    public static boolean hasTargetOrSneak(LivingEntity entity) {
+        return entity.getData(CapabilityInputState.INPUT_STATE).getCommands(entity).contains(InputCommand.SNEAK)
+            || hasTarget(entity);
+    }
+    
+    public static boolean hasTarget(LivingEntity entity) {
+        return hasTarget(entity, entity.getMainHandItem());
+    }
+    
+    public static boolean hasTarget(Entity entity, ItemStack stack) {
+        if (!stack.isEmpty()) {
+            ISlashBladeState state = BladeStateAccess.of(stack).orElse(null);
+            if (state != null) {
+                return hasTarget(entity, state);
+            }
+        }
+        return false;
+    }
+    
+    public static boolean hasTarget(Entity entity, ISlashBladeState state) {
+        Entity target = state.getTargetEntity(entity.level());
+        return target != null && target.isAlive();
     }
 }

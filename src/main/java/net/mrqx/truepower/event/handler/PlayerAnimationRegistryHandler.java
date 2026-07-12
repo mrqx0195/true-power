@@ -10,7 +10,7 @@ import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.Map;
 
-public class PlayerAnimationRegistryHandler {
+public final class PlayerAnimationRegistryHandler {
     private static final ResourceLocation MOTION_LOCATION = SlashBlade.prefix("model/pa/player_motion.vmd");
     private static final PlayerAnimationRegistryHandler INSTANCE = new PlayerAnimationRegistryHandler();
     

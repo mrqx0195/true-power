@@ -1,0 +1,12 @@
+{
+  "behavior": {
+    "cancelAction": {
+      "frame": 0,
+      "jumpOnly": false
+    }
+  },
+  "end_frame": 488,
+  "name": "slashblade.combo_c_end",
+  "priority": 100,
+  "start_frame": 459
+}

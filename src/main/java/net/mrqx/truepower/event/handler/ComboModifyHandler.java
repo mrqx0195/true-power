@@ -1,136 +1,58 @@
 package net.mrqx.truepower.event.handler;
 
 import com.google.common.collect.Maps;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
-import mods.flammpfeil.slashblade.capability.slashblade.ISlashBladeState;
+import mods.flammpfeil.slashblade.init.DefaultResources;
 import mods.flammpfeil.slashblade.registry.combo.ComboState;
 import mods.flammpfeil.slashblade.slasharts.SlashArts;
 import mods.flammpfeil.slashblade.util.AdvancementHelper;
 import mods.flammpfeil.slashblade.util.AttackManager;
 import mods.flammpfeil.slashblade.util.KnockBacks;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.phys.Vec3;
 import net.mrqx.sbr_core.events.ComboStateRegistryEvent;
+import net.mrqx.truepower.attachment.ITruePowerData;
+import net.mrqx.truepower.attachment.ITruePowerStunData;
 import net.mrqx.truepower.config.TruePowerCommonConfig;
+import net.mrqx.truepower.data.ComboModifierData;
 import net.mrqx.truepower.entity.EntityBlastSummonedSword;
+import net.mrqx.truepower.event.TruePowerComboModifyEvent;
 import net.mrqx.truepower.network.ComboSyncMessage;
+import net.mrqx.truepower.util.CollideAction;
+import net.mrqx.truepower.util.ComboModifierManager;
 import net.mrqx.truepower.util.RankManager;
 import net.mrqx.truepower.util.TruePowerComboHelper;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModLoader;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-import java.util.EnumSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 @EventBusSubscriber
-public class ComboModifyHandler {
-    @SuppressWarnings({"unused", "SameParameterValue"})
-    private enum ComboMovementModifiers {
-        COMBO_A1(1, 10, 100, 2, true),
-        COMBO_A1_END(10, 21, 100, 0, true),
-        COMBO_A2(100, 115, 100),
-        COMBO_A2_END(115, 132, 100),
-        
-        COMBO_C(400, 459, 100, 20, true),
-        COMBO_C_END(459, 488, 100, 0),
-        
-        COMBO_A3(200, 218, 100, 10, true),
-        COMBO_A3_END(218, 230, 100, 0, true),
-        COMBO_A3_END2(230, 281, 100),
-        COMBO_A4(500, 576, 100, 15),
-        COMBO_A4_EX(800, 839, 100, 25),
-        COMBO_A5(900, 1013, 100, 70),
-        
-        COMBO_B1(700, 720, 100),
-        COMBO_B_LOOPS(710, 720, 100),
-        COMBO_B_END(720, 743, 100, 12, true),
-        COMBO_B7(710, 764, 100, 15, true),
-        
-        AERIAL_RAVE_A1(710, 764, 100),
-        AERIAL_RAVE_A2(1200, 1210, 100),
-        AERIAL_RAVE_A3(1300, 1328, 100),
-        AERIAL_RAVE_B3(710, 764, 100),
-        AERIAL_RAVE_B4(1500, 1537, 100),
-        
-        UPPER_SLASH(1600, 1659, 90),
-        UPPER_SLASH_JUMP(1700, 1713, 90),
-        
-        AERIAL_CLEAVE(1800, 1812, 70),
-        AERIAL_CLEAVE_LOOP(1812, 1817, 70),
-        AERIAL_CLEAVE_LANDING(1816, 1859, 70),
-        
-        RAPID_SLASH(2000, 2019, 70),
-        RAPID_SLASH_END(2019, 2054, 70),
-        RISING_STAR(2100, 2137, 80),
-        
-        JUDGEMENT_CUT(1900, 1923, 50),
-        JUDGEMENT_CUT_SLASH(1923, 1928, 50),
-        JUDGEMENT_CUT_SLASH_JUST(1923, 1928, 45),
-        
-        VOID_SLASH(2200, 2277, 50, 20, true),
-        TRUE_VOID_SLASH(2200, 2277, 500, 20, true);
-        
-        public final int startFrame;
-        public final int endFrame;
-        public final int priority;
-        
-        public final int canCancelFrame;
-        public final boolean jumpCancelOnly;
-        
-        ComboMovementModifiers(int startFrame, int endFrame, int priority) {
-            this.startFrame = startFrame;
-            this.endFrame = endFrame;
-            this.priority = priority;
-            this.canCancelFrame = -1;
-            this.jumpCancelOnly = false;
-        }
-        
-        ComboMovementModifiers(int startFrame, int endFrame, int priority, int canCancelFrame) {
-            this.startFrame = startFrame;
-            this.endFrame = endFrame;
-            this.priority = priority;
-            this.canCancelFrame = canCancelFrame;
-            this.jumpCancelOnly = false;
-        }
-        
-        ComboMovementModifiers(int startFrame, int endFrame, int priority, int canCancelFrame, boolean jumpCancelOnly) {
-            this.startFrame = startFrame;
-            this.endFrame = endFrame;
-            this.priority = priority;
-            this.canCancelFrame = canCancelFrame;
-            this.jumpCancelOnly = jumpCancelOnly;
-        }
-    }
-    
-    @SuppressWarnings({"unused", "SameParameterValue"})
-    private enum RemoveReleaseAction {
-        COMBO_A3_END3(281, 306, 100),
-        COMBO_A4_END(576, 608, 100),
-        COMBO_A4_EX_END2(877, 894, 100),
-        COMBO_B7_END3(764, 787, 100);
-        
-        public final int startFrame;
-        public final int endFrame;
-        public final int priority;
-        
-        RemoveReleaseAction(int startFrame, int endFrame, int priority) {
-            this.startFrame = startFrame;
-            this.endFrame = endFrame;
-            this.priority = priority;
-        }
-    }
-    
+public final class ComboModifyHandler {
     @SubscribeEvent
     public static void onComboStateRegistryEvent(ComboStateRegistryEvent event) {
         ComboState.Builder builder = event.getBuilder();
         ComboState combo = event.getCombo();
+        
+        TruePowerComboModifyEvent e = new TruePowerComboModifyEvent(builder, combo, event);
+        ModLoader.postEvent(e);
+        if (e.isCanceled()) {
+            if (!e.shouldRemoveDefaultAction()) {
+                builder.addTickAction(ComboModifyHandler::defaultAction);
+            }
+            return;
+        }
         
         if (combo.getStartFrame() == 0
             && combo.getEndFrame() == 1
@@ -138,179 +60,287 @@ public class ComboModifyHandler {
             builder.addTickAction(livingEntity -> RankManager.setPreAddRank(livingEntity, 0));
         }
         
-        EnumSet.allOf(RemoveReleaseAction.class).forEach(remover -> {
-            if (combo.getStartFrame() == remover.startFrame
-                && combo.getEndFrame() == remover.endFrame
-                && combo.getPriority() == remover.priority) {
-                builder.releaseAction((livingEntity, integer) -> SlashArts.ArtsType.Fail);
-            }
-        });
+        ComboModifierData.RemoveReleaseEntry removeRelease =
+            ComboModifierManager.findRemoveRelease(combo.getStartFrame(), combo.getEndFrame(), combo.getPriority());
+        if (removeRelease != null) {
+            builder.releaseAction((livingEntity, integer) -> SlashArts.ArtsType.Fail);
+        }
         
-        AtomicBoolean flag = new AtomicBoolean(false);
-        
-        EnumSet.allOf(ComboMovementModifiers.class).forEach(modifier -> {
-            if (combo.getStartFrame() == modifier.startFrame
-                && combo.getEndFrame() == modifier.endFrame
-                && combo.getPriority() == modifier.priority) {
-                flag.set(true);
-                
-                builder.addTickAction(livingEntity -> BladeStateAccess.of(livingEntity.getMainHandItem()).ifPresent(state -> {
-                    if (!livingEntity.level().isClientSide) {
-                        livingEntity.getPersistentData().putString("truePower.combo", state.getComboSeq().toString());
-                        
-                        long elapsedTime = state.getElapsedTime(livingEntity);
-                        livingEntity.getPersistentData().putBoolean("truePower.canMove",
-                            (modifier.canCancelFrame != -1) && (elapsedTime >= modifier.canCancelFrame));
-                        
-                        livingEntity.getPersistentData().putBoolean("truePower.jumpCancelOnly", modifier.jumpCancelOnly);
-                        livingEntity.getPersistentData().putBoolean("truePower.noMoveEnable", TruePowerCommonConfig.CAN_NOT_MOVE_WHILE_COMBO.get());
-                        
-                        if (livingEntity instanceof ServerPlayer serverPlayer) {
-                            ComboSyncMessage comboSyncMessage = getComboSyncMessage(state, serverPlayer);
-                            PacketDistributor.sendToPlayer(serverPlayer, comboSyncMessage);
-                        }
-                    }
-                }));
-                
-                boolean isJumpCombo = modifier.equals(ComboMovementModifiers.RISING_STAR) || modifier.equals(ComboMovementModifiers.UPPER_SLASH_JUMP);
-                if (isJumpCombo && combo.isAerial()) {
-                    builder.addTickAction((entityIn) -> {
-                        
-                        long elapsed = ComboState.getElapsed(entityIn);
-                        
-                        if (elapsed < 3) {
-                            entityIn.setDeltaMovement(0, entityIn.getDeltaMovement().y * 1.1, 0);
-                            
-                            if (entityIn instanceof ServerPlayer serverPlayer) {
-                                serverPlayer.connection.send(new ClientboundSetEntityMotionPacket(serverPlayer));
-                            }
-                        }
-                    });
-                } else if (modifier.equals(ComboMovementModifiers.AERIAL_RAVE_B3) && combo.isAerial()) {
-                    builder.addTickAction(AdditionalTimeLineTickAction.getBuilder()
-                        .put(6, (entityIn) -> AttackManager.doSlash(entityIn, 180 + 57, Vec3.ZERO, false, false, 0.4, KnockBacks.toss))
-                        .put(7, (entityIn) -> AttackManager.doSlash(entityIn, 180 + 57, Vec3.ZERO, false, false, 0.4, KnockBacks.toss))
-                        .put(8, (entityIn) -> AttackManager.doSlash(entityIn, 180 + 57, Vec3.ZERO, false, false, 0.4, KnockBacks.toss))
-                        .put(9, (entityIn) -> AttackManager.doSlash(entityIn, 180 + 57, Vec3.ZERO, false, false, 0.4, KnockBacks.toss))
-                        .build());
-                }
-                
-                if (modifier.equals(ComboMovementModifiers.COMBO_A3_END2)) {
-                    builder.releaseAction(ComboState::releaseActionQuickCharge);
-                } else if (modifier.equals(ComboMovementModifiers.COMBO_A4)) {
-                    builder.releaseAction((livingEntity, integer) -> TruePowerComboHelper.releaseActionQuickCharge(livingEntity, integer, 15));
-                } else if (modifier.equals(ComboMovementModifiers.COMBO_A4_EX)) {
-                    builder.releaseAction((livingEntity, integer) -> TruePowerComboHelper.releaseActionQuickCharge(livingEntity, integer, 25));
-                } else if (modifier.equals(ComboMovementModifiers.COMBO_A5)) {
-                    builder.releaseAction((livingEntity, integer) -> TruePowerComboHelper.releaseActionQuickCharge(livingEntity, integer, 30, 50));
-                } else if (modifier.equals(ComboMovementModifiers.COMBO_B_END)) {
-                    builder.releaseAction((livingEntity, integer) -> TruePowerComboHelper.releaseActionQuickCharge(livingEntity, integer, 12));
-                } else if (modifier.equals(ComboMovementModifiers.COMBO_B7)) {
-                    builder.releaseAction((livingEntity, integer) -> TruePowerComboHelper.releaseActionQuickCharge(livingEntity, integer, 15));
-                } else if (modifier.equals(ComboMovementModifiers.RAPID_SLASH)) {
-                    builder.clickAction((livingEntity) -> {
-                        AdvancementHelper.grantCriterion(livingEntity, AdvancementHelper.ADVANCEMENT_RAPID_SLASH);
-                        AttackManager.doSlash(livingEntity, -30, AttackManager.genRushOffset(livingEntity), false, true, 0.2f);
-                    });
-                } else if (modifier.equals(ComboMovementModifiers.COMBO_C)) {
-                    builder.addTickAction(AdditionalTimeLineTickAction.getBuilder()
-                        .put(10, (livingEntity) -> EntityBlastSummonedSword.setPreBlastSwordList(livingEntity, AttackManager.isPowered(livingEntity) ? 6 : 1))
-                        .build());
-                } else if (modifier.equals(ComboMovementModifiers.RAPID_SLASH_END)) {
-                    builder.clickAction((livingEntity) -> {
-                        if (AttackManager.isPowered(livingEntity)) {
-                            EntityBlastSummonedSword.setPreBlastSwordList(livingEntity, 1);
-                        }
-                    });
-                }
-                
-                if (modifier.equals(ComboMovementModifiers.COMBO_A1)) {
-                    builder.addTickAction(AdditionalTimeLineTickAction.getBuilder()
-                        .put(0, (livingEntity) -> step(livingEntity, 0.5))
-                        .build());
-                } else if (modifier.equals(ComboMovementModifiers.COMBO_A2)) {
-                    builder.addTickAction(AdditionalTimeLineTickAction.getBuilder()
-                        .put(0, (livingEntity) -> step(livingEntity, 1.5))
-                        .build());
-                } else if (modifier.equals(ComboMovementModifiers.COMBO_A3)) {
-                    builder.addTickAction(AdditionalTimeLineTickAction.getBuilder()
-                        .put(1, (livingEntity) -> step(livingEntity, 1))
-                        .put(5, (livingEntity) -> step(livingEntity, 1))
-                        .build());
-                } else if (modifier.equals(ComboMovementModifiers.COMBO_A4)) {
-                    builder.addTickAction(AdditionalTimeLineTickAction.getBuilder()
-                        .put(7, (livingEntity) -> step(livingEntity, 1.5))
-                        .build());
-                } else if (modifier.equals(ComboMovementModifiers.COMBO_A4_EX)) {
-                    builder.addTickAction(AdditionalTimeLineTickAction.getBuilder()
-                        .put(6, (livingEntity) -> step(livingEntity, 2))
-                        .build());
-                } else if (modifier.equals(ComboMovementModifiers.COMBO_A5)) {
-                    builder.addTickAction(AdditionalTimeLineTickAction.getBuilder()
-                        .put(14, (livingEntity) -> step(livingEntity, 3))
-                        .build());
-                } else if (modifier.equals(ComboMovementModifiers.COMBO_B1)) {
-                    builder.addTickAction(AdditionalTimeLineTickAction.getBuilder()
-                        .put(0, (livingEntity) -> step(livingEntity, 1.5))
-                        .build());
-                } else if (modifier.equals(ComboMovementModifiers.COMBO_B_END)) {
-                    builder.addTickAction(AdditionalTimeLineTickAction.getBuilder()
-                        .put(0, (livingEntity) -> step(livingEntity, 1.5))
-                        .build());
-                } else if (modifier.equals(ComboMovementModifiers.COMBO_B7)) {
-                    builder.addTickAction(AdditionalTimeLineTickAction.getBuilder()
-                        .put(0, (livingEntity) -> step(livingEntity, 1.5))
-                        .build());
-                }
-                
-                if (modifier.equals(ComboMovementModifiers.AERIAL_RAVE_A1)) {
-                    builder.addTickAction(AdditionalTimeLineTickAction.getBuilder()
-                        .put(0, (livingEntity) -> livingEntity.setDeltaMovement(0, 0, 0))
-                        .build());
-                }
+        boolean matched = false;
+        if (combo.getMotionLoc().equals(DefaultResources.ExMotionLocation)) {
+            ComboModifierData.ComboModifierEntry entry =
+                ComboModifierManager.findModifier(combo.getStartFrame(), combo.getEndFrame(), combo.getPriority());
+            if (entry != null) {
+                matched = true;
+                applyEntryBehavior(entry, combo, builder);
             }
-        });
-        if (!flag.get()) {
-            builder.addTickAction(livingEntity -> BladeStateAccess.of(livingEntity.getMainHandItem()).ifPresent(state -> {
-                if (!livingEntity.level().isClientSide) {
-                    livingEntity.getPersistentData().putString("truePower.combo", state.getComboSeq().toString());
-                    
-                    livingEntity.getPersistentData().putBoolean("truePower.canMove", true);
-                    
-                    livingEntity.getPersistentData().putBoolean("truePower.jumpCancelOnly", false);
-                    
-                    livingEntity.getPersistentData().putBoolean("truePower.noMoveEnable", TruePowerCommonConfig.CAN_NOT_MOVE_WHILE_COMBO.get());
-                    
-                    if (livingEntity instanceof ServerPlayer serverPlayer) {
-                        ComboSyncMessage comboSyncMessage = getComboSyncMessage(state, serverPlayer);
-                        PacketDistributor.sendToPlayer(serverPlayer, comboSyncMessage);
-                    }
-                }
-            }));
+        }
+        
+        if (!matched) {
+            if (!e.shouldRemoveDefaultAction()) {
+                builder.addTickAction(ComboModifyHandler::defaultAction);
+            }
         }
     }
     
-    private static ComboSyncMessage getComboSyncMessage(ISlashBladeState state, ServerPlayer serverPlayer) {
-        CompoundTag persistentData = serverPlayer.getPersistentData();
-        return new ComboSyncMessage(
-            state.getComboSeq(),
-            state.getLastActionTime(),
-            persistentData.getBoolean("truePower.canMove"),
-            persistentData.getBoolean("truePower.jumpCancelOnly"),
-            persistentData.getBoolean("truePower.noMoveEnable"),
-            false
-        );
+    private static void applyEntryBehavior(ComboModifierData.ComboModifierEntry entry, ComboState combo, ComboState.Builder builder) {
+        JsonElement behaviorEl = entry.behavior();
+        if (behaviorEl == null || !behaviorEl.isJsonObject()) {
+            return;
+        }
+        JsonObject behavior = behaviorEl.getAsJsonObject();
+        
+        if (behavior.has(ComboModifierData.KEY_CANCEL_ACTION)) {
+            JsonObject cancel = behavior.getAsJsonObject(ComboModifierData.KEY_CANCEL_ACTION);
+            int frame = ComboModifierData.optInt(cancel, ComboModifierData.KEY_FRAME, -1);
+            boolean jumpOnly = ComboModifierData.optBool(cancel, ComboModifierData.KEY_JUMP_ONLY, false);
+            builder.addTickAction(livingEntity -> cancelAction(livingEntity, frame, jumpOnly));
+        }
+        
+        if (behavior.has(ComboModifierData.KEY_STEP)) {
+            JsonArray steps = behavior.getAsJsonArray(ComboModifierData.KEY_STEP);
+            AdditionalTimeLineTickAction.Builder timelineBuilder =
+                AdditionalTimeLineTickAction.getBuilder();
+            for (JsonElement stepEl : steps) {
+                if (stepEl.isJsonObject()) {
+                    JsonObject stepObj = stepEl.getAsJsonObject();
+                    int tick = ComboModifierData.optInt(stepObj, ComboModifierData.KEY_TICK, 0);
+                    double distance = ComboModifierData.optDouble(stepObj, ComboModifierData.KEY_DISTANCE, 0);
+                    timelineBuilder.put(tick, (livingEntity) -> step(livingEntity, distance));
+                }
+            }
+            builder.addTickAction(timelineBuilder.build());
+        }
+        
+        if (behavior.has(ComboModifierData.BEHAVIOR_ZERO_VELOCITY)) {
+            builder.addTickAction(ComboState.TimeLineTickAction.getBuilder()
+                .put(0, (livingEntity) -> livingEntity.setDeltaMovement(0, 0, 0))
+                .build());
+        }
+        
+        if (behavior.has(ComboModifierData.BEHAVIOR_JUMP_VELOCITY_BOOST) && combo.isAerial()) {
+            JsonObject config = behavior.getAsJsonObject(ComboModifierData.BEHAVIOR_JUMP_VELOCITY_BOOST);
+            double multiplier = ComboModifierData.optDouble(config, ComboModifierData.PARAM_MULTIPLIER, 1.1);
+            int duration = ComboModifierData.optInt(config, ComboModifierData.PARAM_DURATION, 3);
+            builder.addTickAction((entityIn) -> {
+                long elapsed = ComboState.getElapsed(entityIn);
+                if (elapsed < duration) {
+                    entityIn.setDeltaMovement(0, entityIn.getDeltaMovement().y * multiplier, 0);
+                    if (entityIn instanceof ServerPlayer serverPlayer) {
+                        serverPlayer.connection.send(new ClientboundSetEntityMotionPacket(serverPlayer));
+                    }
+                }
+            });
+        }
+        
+        if (behavior.has(ComboModifierData.BEHAVIOR_AERIAL_RAVE_B3_MULTIHIT) && combo.isAerial()) {
+            JsonObject config = behavior.getAsJsonObject(ComboModifierData.BEHAVIOR_AERIAL_RAVE_B3_MULTIHIT);
+            int startTick = ComboModifierData.optInt(config, ComboModifierData.PARAM_START_TICK, 6);
+            int count = ComboModifierData.optInt(config, ComboModifierData.PARAM_COUNT, 4);
+            double angle = ComboModifierData.optDouble(config, ComboModifierData.PARAM_ANGLE, 180 + 57);
+            double damage = ComboModifierData.optDouble(config, ComboModifierData.PARAM_DAMAGE, 0.4);
+            AdditionalTimeLineTickAction.Builder timelineBuilder =
+                AdditionalTimeLineTickAction.getBuilder();
+            for (int i = 0; i < count; i++) {
+                final int tick = startTick + i;
+                timelineBuilder.put(tick, (entityIn) ->
+                    AttackManager.doSlash(entityIn, (float) angle, Vec3.ZERO, false, false, damage, KnockBacks.toss));
+            }
+            builder.addTickAction(timelineBuilder.build());
+        }
+        
+        if (behavior.has(ComboModifierData.BEHAVIOR_RELEASE_QUICK_CHARGE)) {
+            JsonObject config = behavior.getAsJsonObject(ComboModifierData.BEHAVIOR_RELEASE_QUICK_CHARGE);
+            int charge = ComboModifierData.optInt(config, ComboModifierData.PARAM_CHARGE, -1);
+            int chargeMin = ComboModifierData.optInt(config, ComboModifierData.PARAM_CHARGE_MIN, -1);
+            int chargeMax = ComboModifierData.optInt(config, ComboModifierData.PARAM_CHARGE_MAX, -1);
+            
+            if (chargeMin != -1 && chargeMax != -1) {
+                builder.releaseAction((livingEntity, integer) ->
+                    TruePowerComboHelper.releaseActionQuickCharge(livingEntity, integer, chargeMin, chargeMax));
+            } else if (charge != -1) {
+                builder.releaseAction((livingEntity, integer) ->
+                    TruePowerComboHelper.releaseActionQuickCharge(livingEntity, integer, charge));
+            } else {
+                builder.releaseAction(ComboState::releaseActionQuickCharge);
+            }
+        }
+        
+        if (behavior.has(ComboModifierData.BEHAVIOR_CLICK_RAPID_SLASH)) {
+            builder.clickAction((livingEntity) -> {
+                AdvancementHelper.grantCriterion(livingEntity, AdvancementHelper.ADVANCEMENT_RAPID_SLASH);
+                AttackManager.doSlash(livingEntity, -30, AttackManager.genRushOffset(livingEntity), false, true, 0.2f);
+            });
+        }
+        
+        if (behavior.has(ComboModifierData.BEHAVIOR_CLICK_SUMMON_BLAST_SWORD)) {
+            builder.clickAction((livingEntity) -> {
+                if (AttackManager.isPowered(livingEntity)) {
+                    EntityBlastSummonedSword.setPreBlastSwordList(livingEntity, 1);
+                }
+            });
+        }
+        
+        if (behavior.has(ComboModifierData.BEHAVIOR_TICK_SUMMON_BLAST_SWORD)) {
+            JsonObject config = behavior.getAsJsonObject(ComboModifierData.BEHAVIOR_TICK_SUMMON_BLAST_SWORD);
+            int tick = ComboModifierData.optInt(config, ComboModifierData.PARAM_TICK, 10);
+            int poweredCount = ComboModifierData.optInt(config, ComboModifierData.PARAM_POWERED_COUNT, 6);
+            int normalCount = ComboModifierData.optInt(config, ComboModifierData.PARAM_NORMAL_COUNT, 1);
+            builder.addTickAction(ComboState.TimeLineTickAction.getBuilder()
+                .put(tick, (livingEntity) -> EntityBlastSummonedSword.setPreBlastSwordList(livingEntity,
+                    AttackManager.isPowered(livingEntity) ? poweredCount : normalCount))
+                .build());
+        }
+        
+        if (behavior.has(ComboModifierData.BEHAVIOR_TICK_COLLIDE_ACTION)) {
+            JsonArray entries = behavior.getAsJsonArray(ComboModifierData.BEHAVIOR_TICK_COLLIDE_ACTION);
+            List<ITruePowerData.CollideInterval> intervals = new ArrayList<>();
+            for (JsonElement el : entries) {
+                if (el.isJsonObject()) {
+                    JsonObject obj = el.getAsJsonObject();
+                    int start = ComboModifierData.optInt(obj, ComboModifierData.KEY_START, 0);
+                    int end = ComboModifierData.optInt(obj, ComboModifierData.KEY_END, 0);
+                    CollideAction action = CollideAction.valueOf(
+                        ComboModifierData.optString(obj, ComboModifierData.KEY_ACTION, "SOLID"));
+                    intervals.add(new ITruePowerData.CollideInterval(start, end, action));
+                }
+            }
+            builder.addTickAction((livingEntity) -> {
+                ITruePowerData data = ITruePowerData.get(livingEntity);
+                data.setCollideIntervals(intervals);
+            });
+        }
+        
+        if (behavior.has(ComboModifierData.BEHAVIOR_TICK_SNAP_LOCK_ON)) {
+            JsonArray entries = behavior.getAsJsonArray(ComboModifierData.BEHAVIOR_TICK_SNAP_LOCK_ON);
+            List<ITruePowerData.BoolInterval> intervals = new ArrayList<>();
+            for (JsonElement el : entries) {
+                if (el.isJsonObject()) {
+                    JsonObject obj = el.getAsJsonObject();
+                    int start = ComboModifierData.optInt(obj, ComboModifierData.KEY_START, 0);
+                    int end = ComboModifierData.optInt(obj, ComboModifierData.KEY_END, 0);
+                    intervals.add(new ITruePowerData.BoolInterval(start, end, true));
+                }
+            }
+            builder.addTickAction((livingEntity) -> {
+                ITruePowerData data = ITruePowerData.get(livingEntity);
+                data.setSnapLockOnIntervals(intervals);
+            });
+        }
+        
+        if (behavior.has(ComboModifierData.BEHAVIOR_TICK_SHOULD_LOCK_ON)) {
+            JsonArray entries = behavior.getAsJsonArray(ComboModifierData.BEHAVIOR_TICK_SHOULD_LOCK_ON);
+            List<ITruePowerData.BoolInterval> intervals = new ArrayList<>();
+            for (JsonElement el : entries) {
+                if (el.isJsonObject()) {
+                    JsonObject obj = el.getAsJsonObject();
+                    int start = ComboModifierData.optInt(obj, ComboModifierData.KEY_START, 0);
+                    int end = ComboModifierData.optInt(obj, ComboModifierData.KEY_END, 0);
+                    boolean value = ComboModifierData.optBool(obj, ComboModifierData.KEY_VALUE, true);
+                    intervals.add(new ITruePowerData.BoolInterval(start, end, value));
+                }
+            }
+            builder.addTickAction((livingEntity) -> {
+                ITruePowerData data = ITruePowerData.get(livingEntity);
+                data.setLockOnIntervals(intervals);
+            });
+        }
+        
+        if (behavior.has(ComboModifierData.BEHAVIOR_TICK_STUN)) {
+            JsonArray stuns = behavior.getAsJsonArray(ComboModifierData.BEHAVIOR_TICK_STUN);
+            AdditionalTimeLineTickAction.Builder timelineBuilder =
+                AdditionalTimeLineTickAction.getBuilder();
+            for (JsonElement stunEl : stuns) {
+                if (stunEl.isJsonObject()) {
+                    JsonObject stunObj = stunEl.getAsJsonObject();
+                    int tick = ComboModifierData.optInt(stunObj, ComboModifierData.KEY_TICK, 0);
+                    double stunValue = ComboModifierData.optDouble(stunObj, ComboModifierData.PARAM_STUN_VALUE, 0);
+                    boolean needPower = ComboModifierData.optBool(stunObj, ComboModifierData.PARAM_NEED_POWER, false);
+                    timelineBuilder.put(tick, (livingEntity) -> stun(livingEntity, (float) stunValue, needPower));
+                }
+            }
+            builder.addTickAction(timelineBuilder.build());
+        }
+    }
+    
+    public static void cancelAction(LivingEntity livingEntity, int canCancelFrame, boolean isJumpCancelOnly) {
+        BladeStateAccess.of(livingEntity.getMainHandItem()).ifPresent(state -> {
+            if (!livingEntity.level().isClientSide) {
+                ITruePowerData data = ITruePowerData.get(livingEntity);
+                data.setCombo(state.getComboSeq().toString());
+                long elapsedTime = state.getElapsedTime(livingEntity);
+                data.setCanMove((canCancelFrame != -1) && (elapsedTime >= canCancelFrame));
+                data.setJumpCancelOnly(isJumpCancelOnly);
+                data.setNoMoveEnable(TruePowerCommonConfig.CAN_NOT_MOVE_WHILE_COMBO.get());
+                data.setCollideIntervals(null);
+                data.setLockOnIntervals(null);
+                data.setSnapLockOnIntervals(null);
+                
+                if (livingEntity instanceof ServerPlayer serverPlayer) {
+                    ComboSyncMessage comboSyncMessage = new ComboSyncMessage(
+                        state.getComboSeq(),
+                        state.getLastActionTime(),
+                        data.canMove(),
+                        data.isJumpCancelOnly(),
+                        data.isNoMoveEnable(),
+                        false
+                    );
+                    
+                    PacketDistributor.sendToPlayer(serverPlayer, comboSyncMessage);
+                }
+            }
+        });
+    }
+    
+    public static void defaultAction(LivingEntity livingEntity) {
+        BladeStateAccess.of(livingEntity.getMainHandItem()).ifPresent(state -> {
+            if (!livingEntity.level().isClientSide) {
+                ITruePowerData data = ITruePowerData.get(livingEntity);
+                data.setCombo(state.getComboSeq().toString());
+                data.setCanMove(true);
+                data.setJumpCancelOnly(false);
+                data.setNoMoveEnable(TruePowerCommonConfig.CAN_NOT_MOVE_WHILE_COMBO.get());
+                data.setCollideIntervals(null);
+                data.setLockOnIntervals(null);
+                data.setSnapLockOnIntervals(null);
+                
+                if (livingEntity instanceof ServerPlayer serverPlayer) {
+                    ComboSyncMessage comboSyncMessage = new ComboSyncMessage(
+                        state.getComboSeq(),
+                        state.getLastActionTime(),
+                        data.canMove(),
+                        data.isJumpCancelOnly(),
+                        data.isNoMoveEnable(),
+                        false
+                    );
+                    
+                    PacketDistributor.sendToPlayer(serverPlayer, comboSyncMessage);
+                }
+            }
+        });
     }
     
     public static void step(LivingEntity livingEntity, double step) {
         if (TruePowerCommonConfig.STEP_WHEN_USING_COMBO.get()) {
-            Vec3 input = new Vec3(0, 0, step);
-            
+            Vec3 input = new Vec3(0, 0, step / 4);
             livingEntity.moveRelative(1, input);
-            
             Vec3 motion = TrickHandler.maybeBackOffFromEdge(livingEntity.getDeltaMovement(), livingEntity);
-            
             livingEntity.move(MoverType.SELF, motion);
+        }
+    }
+    
+    public static void stun(LivingEntity livingEntity, float stunValue, boolean needPower) {
+        if (TruePowerCommonConfig.ENABLE_STUN_VALUE.get()) {
+            if (needPower && !AttackManager.isPowered(livingEntity)) {
+                return;
+            }
+            AttackManager.areaAttack(livingEntity, __ -> {
+                }, 0, true, false, true)
+                .stream()
+                .filter(e -> e instanceof LivingEntity)
+                .map(e -> (LivingEntity) e)
+                .map(ITruePowerStunData::get)
+                .forEach(data -> data.addStunValue(livingEntity, stunValue));
         }
     }
     
@@ -342,10 +372,10 @@ public class ComboModifyHandler {
         @Override
         public void accept(LivingEntity livingEntity) {
             long elapsed = ComboState.getElapsed(livingEntity);
-            int adjustElapsed = (int) elapsed;
+            int adjustElapsed = (int) elapsed - 1;
             
             BladeStateAccess.of(livingEntity.getMainHandItem()).ifPresent(state -> {
-                if (state.getLastProcessedComboTick() != adjustElapsed) {
+                if (state.getLastProcessedComboTick() != -1 && state.getLastProcessedComboTick() != adjustElapsed) {
                     return;
                 }
                 

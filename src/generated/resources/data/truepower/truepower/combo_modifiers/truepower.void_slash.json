@@ -1,0 +1,12 @@
+{
+  "behavior": {
+    "cancelAction": {
+      "frame": 20,
+      "jumpOnly": true
+    }
+  },
+  "end_frame": 2277,
+  "name": "truepower.void_slash",
+  "priority": 500,
+  "start_frame": 2200
+}

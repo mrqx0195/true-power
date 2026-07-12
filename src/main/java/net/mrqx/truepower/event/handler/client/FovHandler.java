@@ -9,7 +9,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ComputeFovModifierEvent;
 
 @EventBusSubscriber(Dist.CLIENT)
-public class FovHandler {
+public final class FovHandler {
     @SubscribeEvent
     public static void onComputeFovModifierEvent(ComputeFovModifierEvent event) {
         Player player = event.getPlayer();

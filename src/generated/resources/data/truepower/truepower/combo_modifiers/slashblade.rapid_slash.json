@@ -1,0 +1,33 @@
+{
+  "behavior": {
+    "cancelAction": {
+      "frame": -1,
+      "jumpOnly": false
+    },
+    "clickRapidSlash": {},
+    "tickCollideAction": [
+      {
+        "action": "IGNORE",
+        "end": 6,
+        "start": 0
+      }
+    ],
+    "tickShouldLockOn": [
+      {
+        "end": 6,
+        "start": 2,
+        "value": false
+      }
+    ],
+    "tickSnapLockOn": [
+      {
+        "end": 2,
+        "start": 0
+      }
+    ]
+  },
+  "end_frame": 2019,
+  "name": "slashblade.rapid_slash",
+  "priority": 70,
+  "start_frame": 2000
+}

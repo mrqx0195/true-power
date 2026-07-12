@@ -1,0 +1,16 @@
+{
+  "behavior": {
+    "cancelAction": {
+      "frame": -1,
+      "jumpOnly": false
+    },
+    "jumpVelocityBoost": {
+      "duration": 3,
+      "multiplier": 1.1
+    }
+  },
+  "end_frame": 1713,
+  "name": "slashblade.upperslash_jump",
+  "priority": 90,
+  "start_frame": 1700
+}

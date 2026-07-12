@@ -1,6 +1,5 @@
 package net.mrqx.truepower.entity;
 
-import mods.flammpfeil.slashblade.ability.StunManager;
 import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.entity.EntityAbstractSummonedSword;
 import mods.flammpfeil.slashblade.entity.Projectile;
@@ -17,6 +16,7 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.mrqx.truepower.TruePowerMod;
+import net.mrqx.truepower.attachment.ITruePowerStunData;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -108,7 +108,8 @@ public class EntityBlastSummonedSword extends EntityAbstractSummonedSword {
         List<Entity> list = TargetSelector.getTargettableEntitiesWithinAABB(this.level(), 2.0F, this);
         this.setDamage(this.getBurstDamage());
         list.stream().filter((e) -> e instanceof LivingEntity).map((e) -> (LivingEntity) e).forEach(livingEntity -> {
-            StunManager.setStun(livingEntity);
+            ITruePowerStunData stunData = ITruePowerStunData.get(livingEntity);
+            stunData.triggerStun(60);
             livingEntity.setDeltaMovement(0, livingEntity.getDeltaMovement().y >= 1 ? livingEntity.getDeltaMovement().y + 0.05 : 1, 0);
         });
         super.burst(effects, focusEntity);

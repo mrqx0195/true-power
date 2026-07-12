@@ -1,0 +1,13 @@
+{
+  "behavior": {
+    "cancelAction": {
+      "frame": -1,
+      "jumpOnly": false
+    },
+    "clickSummonBlastSword": {}
+  },
+  "end_frame": 2054,
+  "name": "slashblade.rapid_slash_end",
+  "priority": 70,
+  "start_frame": 2019
+}

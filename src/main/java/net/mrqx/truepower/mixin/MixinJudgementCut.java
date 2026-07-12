@@ -19,13 +19,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(JudgementCut.class)
 public abstract class MixinJudgementCut {
     @Inject(method = "doJudgementCut(Lnet/minecraft/world/entity/LivingEntity;)Lmods/flammpfeil/slashblade/entity/EntityJudgementCut;", at = @At("RETURN"), remap = false)
     private static void injectDoJudgementCut(LivingEntity user, CallbackInfoReturnable<EntityJudgementCut> cir, @Local(name = "pos") Vec3 pos) {
-        List<LivingEntity> entities = new java.util.ArrayList<>(user.level()
+        List<LivingEntity> entities = new ArrayList<>(user.level()
             .getNearbyEntities(LivingEntity.class, TargetSelector.lockon, user, user.getBoundingBox().inflate(12.0F, 6.0F, 12.0F))
             .stream().filter(livingEntity -> !livingEntity.position().add(0, livingEntity.getEyeHeight(), 0).equals(pos) && !livingEntity.position().add(0, livingEntity.getEyeHeight() / 2, 0).equals(pos))
             .toList());

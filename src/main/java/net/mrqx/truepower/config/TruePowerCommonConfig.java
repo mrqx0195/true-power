@@ -1,6 +1,7 @@
 package net.mrqx.truepower.config;
 
 
+import net.mrqx.truepower.util.CollideAction;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class TruePowerCommonConfig {
@@ -17,10 +18,12 @@ public class TruePowerCommonConfig {
     public static final ModConfigSpec.DoubleValue POWERED_VOID_SLASH_DAMAGE_FIRST;
     public static final ModConfigSpec.DoubleValue POWERED_VOID_SLASH_DAMAGE_SECOND;
     public static final ModConfigSpec.IntValue JUDGEMENT_CUT_EXTRA_TARGET;
+    public static final ModConfigSpec.BooleanValue ENABLE_STUN_VALUE;
     
     public static final ModConfigSpec.BooleanValue MODIFY_SUMMONED_SWORD_DAMAGE;
     public static final ModConfigSpec.DoubleValue SUMMONED_SWORD_DAMAGE_MULTIPLIER;
     
+    public static final ModConfigSpec.EnumValue<CollideAction> COLLIDE_ACTION;
     public static final ModConfigSpec.BooleanValue STEP_WHEN_USING_COMBO;
     
     static {
@@ -82,6 +85,10 @@ public class TruePowerCommonConfig {
             JUDGEMENT_CUT_EXTRA_TARGET = commonBuilder
                 .comment("Set the additional number of targets for Judgement Cut while player is powered. (default: 2)")
                 .defineInRange("judgement_cut_extra_target", 2, 0, Integer.MAX_VALUE);
+            
+            ENABLE_STUN_VALUE = commonBuilder
+                .comment("Enable TruePower's custom stun value system (default: true)")
+                .define("enable_stun_value", true);
         }
         {
             commonBuilder.pop()
@@ -97,11 +104,15 @@ public class TruePowerCommonConfig {
         }
         {
             commonBuilder.pop()
-                .push("Experimental settings");
+                .push("Misc settings");
+            
+            COLLIDE_ACTION = commonBuilder
+                .comment("Collide action while using slashblade. (default: SOLID)")
+                .defineEnum("collide_action", CollideAction.SOLID);
             
             STEP_WHEN_USING_COMBO = commonBuilder
-                .comment("Move forward while using combo. (default: false)")
-                .define("step_when_using_combo", false);
+                .comment("Move forward while using combo. (default: true)")
+                .define("step_when_using_combo", true);
         }
         commonBuilder.pop();
         COMMON_CONFIG = commonBuilder.build();

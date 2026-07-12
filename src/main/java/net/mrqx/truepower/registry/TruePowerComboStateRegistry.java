@@ -1,11 +1,11 @@
 package net.mrqx.truepower.registry;
 
 import mods.flammpfeil.slashblade.SlashBlade;
-import mods.flammpfeil.slashblade.ability.StunManager;
 import mods.flammpfeil.slashblade.event.handler.FallHandler;
 import mods.flammpfeil.slashblade.registry.combo.ComboState;
 import mods.flammpfeil.slashblade.util.AttackManager;
 import net.mrqx.truepower.TruePowerMod;
+import net.mrqx.truepower.attachment.ITruePowerStunData;
 import net.mrqx.truepower.config.TruePowerCommonConfig;
 import net.mrqx.truepower.util.TruePowerAttackManager;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -47,7 +47,7 @@ public class TruePowerComboStateRegistry {
         .rotationKeyframe(57 + 9, 0)
         .rotationKeyframe(57 + 10, 0)
         .addTickAction(FallHandler::fallDecrease)
-        .addHitEffect((t, a) -> StunManager.setStun(t, 60))::build);
+        .addHitEffect((t, a) -> ITruePowerStunData.get(t).triggerStun(60))::build);
     
     public static final DeferredHolder<ComboState, ComboState> VOID_SLASH_SHEATH = COMBO_STATE.register("void_slash_sheath",
         ComboState.Builder.newInstance().startAndEnd(2278, 2299).priority(50)

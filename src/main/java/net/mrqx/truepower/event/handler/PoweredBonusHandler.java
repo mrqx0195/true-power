@@ -9,13 +9,14 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.mrqx.truepower.TruePowerMod;
+import net.mrqx.truepower.event.TruePowerStunEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
 @EventBusSubscriber
-public class PoweredBonusHandler {
+public final class PoweredBonusHandler {
     @SubscribeEvent
     public static void onTick(EntityTickEvent.Post event) {
         Entity entity = event.getEntity();
@@ -71,6 +72,16 @@ public class PoweredBonusHandler {
     public static void onLivingHurtEvent(LivingDamageEvent.Pre event) {
         if (AttackManager.isPowered(event.getEntity())) {
             event.setNewDamage(event.getNewDamage() * 0.5F);
+        }
+    }
+    
+    @SubscribeEvent
+    public static void onAddStunValue(TruePowerStunEvent.AddStunValue event) {
+        if (event.getSource() != null && AttackManager.isPowered(event.getSource())) {
+            event.setAdditionValue(event.getAdditionValue() * 1.2F);
+        }
+        if (AttackManager.isPowered(event.getEntity())) {
+            event.setAdditionValue(event.getAdditionValue() * 0.75F);
         }
     }
 }

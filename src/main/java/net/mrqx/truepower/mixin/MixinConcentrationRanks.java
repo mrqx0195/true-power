@@ -24,7 +24,6 @@ public abstract class MixinConcentrationRanks {
     @Shadow(remap = false)
     public static float MAX_LEVEL;
     
-    @SuppressWarnings("NameDoesntMatchTargetClass")
     @Inject(method = "<init>", at = @At("RETURN"))
     private void injectInit(String name, int ordinal, int level, Range<Float> pointRange, CallbackInfo ci) {
         if (this.level == 5) {

@@ -25,12 +25,12 @@ import java.util.LinkedList;
 import java.util.Optional;
 
 @EventBusSubscriber
-public class HeavyRainSwordHandler {
+public final class HeavyRainSwordHandler {
     private static final LinkedList<InputStream.TimeLineKeyInput> HEAVY_RAIN_SWORD_TIME_LINE = new LinkedList<>();
     
     static {
-        HEAVY_RAIN_SWORD_TIME_LINE.add(new InputStream.TimeLineKeyInput(3, 0, InputCommand.FORWARD, EnumSet.noneOf(InputCommand.class), InputStream.InputType.START));
-        HEAVY_RAIN_SWORD_TIME_LINE.add(new InputStream.TimeLineKeyInput(3, 0, InputCommand.BACK, EnumSet.noneOf(InputCommand.class), InputStream.InputType.START));
+        HEAVY_RAIN_SWORD_TIME_LINE.add(new InputStream.TimeLineKeyInput(5, -2, InputCommand.FORWARD, EnumSet.noneOf(InputCommand.class), InputStream.InputType.START));
+        HEAVY_RAIN_SWORD_TIME_LINE.add(new InputStream.TimeLineKeyInput(7, -2, InputCommand.BACK, EnumSet.noneOf(InputCommand.class), InputStream.InputType.START));
     }
     
     

@@ -1,0 +1,12 @@
+{
+  "behavior": {
+    "cancelAction": {
+      "frame": 0,
+      "jumpOnly": true
+    }
+  },
+  "end_frame": 1817,
+  "name": "slashblade.aerial_cleave_loop",
+  "priority": 70,
+  "start_frame": 1812
+}

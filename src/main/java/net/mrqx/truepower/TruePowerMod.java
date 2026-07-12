@@ -7,10 +7,13 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobCategory;
+import net.mrqx.truepower.attachment.TruePowerAttachments;
 import net.mrqx.truepower.config.TruePowerClientConfig;
 import net.mrqx.truepower.config.TruePowerCommonConfig;
 import net.mrqx.truepower.entity.EntityBlastSummonedSword;
+import net.mrqx.truepower.registry.TruePowerAttributeRegistry;
 import net.mrqx.truepower.registry.TruePowerComboStateRegistry;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -19,6 +22,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import org.slf4j.Logger;
 
@@ -35,10 +39,21 @@ public class TruePowerMod {
         container.registerConfig(ModConfig.Type.CLIENT, TruePowerClientConfig.CLIENT_CONFIG);
         container.registerConfig(ModConfig.Type.COMMON, TruePowerCommonConfig.COMMON_CONFIG);
         TruePowerComboStateRegistry.COMBO_STATE.register(modEventBus);
+        TruePowerAttachments.ATTACHMENTS.register(modEventBus);
+        TruePowerAttributeRegistry.ATTRIBUTES.register(modEventBus);
+        modEventBus.addListener(TruePowerMod::onEntityAttributeModification);
+    }
+    
+    public static void onEntityAttributeModification(EntityAttributeModificationEvent event) {
+        event.getTypes().forEach(type -> {
+            if (type.getBaseClass().isAssignableFrom(LivingEntity.class)) {
+                event.add(type, TruePowerAttributeRegistry.STUN_RESISTANCE);
+            }
+        });
     }
     
     @EventBusSubscriber
-    public static class RegistryEvents {
+    public final static class RegistryEvents {
         public static final ResourceLocation ENTITY_BLAST_SUMMONED_SWORD_RESOURCE_LOCATION = prefix(classToString(EntityBlastSummonedSword.class));
         @SuppressWarnings("NotNullFieldNotInitialized")
         public static EntityType<EntityBlastSummonedSword> BlastSummonedSword;

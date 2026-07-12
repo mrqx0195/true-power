@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(SummonedSwordArts.class)
-public class MixinSummonedSwordArts {
+public abstract class MixinSummonedSwordArts {
     @WrapOperation(method = "onInputChange(Lmods/flammpfeil/slashblade/event/handler/InputCommandEvent;)V",
         at = @At(
             value = "INVOKE",

@@ -7,7 +7,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 @EventBusSubscriber
-public class JustSlashArtHandler {
+public final class JustSlashArtHandler {
     @SubscribeEvent
     public static void onPlayerTickEvent(PlayerTickEvent.Pre event) {
         if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) {

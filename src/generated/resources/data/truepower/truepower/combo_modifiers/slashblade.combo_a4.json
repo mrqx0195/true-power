@@ -1,0 +1,21 @@
+{
+  "behavior": {
+    "cancelAction": {
+      "frame": 15,
+      "jumpOnly": false
+    },
+    "releaseActionQuickCharge": {
+      "charge": 15
+    },
+    "step": [
+      {
+        "distance": 1.5,
+        "tick": 7
+      }
+    ]
+  },
+  "end_frame": 576,
+  "name": "slashblade.combo_a4",
+  "priority": 100,
+  "start_frame": 500
+}

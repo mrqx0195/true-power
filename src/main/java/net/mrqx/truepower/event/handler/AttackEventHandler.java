@@ -17,7 +17,7 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import java.util.List;
 
 @EventBusSubscriber
-public class AttackEventHandler {
+public final class AttackEventHandler {
     @SubscribeEvent
     public static void onLivingAttackEvent(LivingIncomingDamageEvent event) {
         if (event.getSource().getEntity() instanceof LivingEntity livingEntity) {

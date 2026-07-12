@@ -7,7 +7,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
 
 @EventBusSubscriber
-public class LivingJumpEventHandler {
+public final class LivingJumpEventHandler {
     @SubscribeEvent
     public static void onPlayerJump(LivingEvent.LivingJumpEvent event) {
         BladeStateAccess.of(event.getEntity().getMainHandItem()).ifPresent(state -> state.updateComboSeq(event.getEntity(), ComboStateRegistry.NONE.getId()));

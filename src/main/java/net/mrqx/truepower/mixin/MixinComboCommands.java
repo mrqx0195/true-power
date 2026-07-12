@@ -5,7 +5,7 @@ import mods.flammpfeil.slashblade.registry.combo.ComboCommands;
 import mods.flammpfeil.slashblade.util.InputCommand;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
-import net.mrqx.truepower.event.handler.combo.VoidSlashHandler;
+import net.mrqx.truepower.combo.VoidSlashHandler;
 import net.mrqx.truepower.registry.TruePowerComboStateRegistry;
 import net.mrqx.truepower.util.JustSlashArtManager;
 import org.spongepowered.asm.mixin.Mixin;

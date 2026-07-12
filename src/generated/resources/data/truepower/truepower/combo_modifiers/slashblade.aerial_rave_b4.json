@@ -1,0 +1,24 @@
+{
+  "behavior": {
+    "cancelAction": {
+      "frame": -1,
+      "jumpOnly": false
+    },
+    "tickStun": [
+      {
+        "needPower": false,
+        "stunValue": 15,
+        "tick": 6
+      },
+      {
+        "needPower": false,
+        "stunValue": 15,
+        "tick": 7
+      }
+    ]
+  },
+  "end_frame": 1537,
+  "name": "slashblade.aerial_rave_b4",
+  "priority": 80,
+  "start_frame": 1500
+}
