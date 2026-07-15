@@ -28,20 +28,20 @@ license="${mod_license}"
 
 [[dependencies.${mod_id}]]
     modId="slashblade"
-    mandatory=true
+    type="required"
     versionRange="${slash_blade_version_range}"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.${mod_id}]]
     modId="sbr_core"
-    mandatory=true
+    type="required"
     versionRange="${mrqx_slash_blade_core_version_range}"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.${mod_id}]]
     modId="kubejs"
-    mandatory=false
+    type="optional"
     ordering="AFTER"
     side="BOTH"
