@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.MovementInputUpdateEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.mrqx.truepower.capability.data.ITruePowerData;
@@ -19,7 +20,7 @@ import net.mrqx.truepower.util.ITruePowerInput;
 @Mod.EventBusSubscriber(Dist.CLIENT)
 @OnlyIn(Dist.CLIENT)
 public final class MovementEventHandler {
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onMovementInputUpdateEvent(MovementInputUpdateEvent event) {
         Player player = event.getEntity();
         ItemStack itemStack = player.getMainHandItem();

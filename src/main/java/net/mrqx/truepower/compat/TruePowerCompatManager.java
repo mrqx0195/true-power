@@ -26,7 +26,7 @@ public class TruePowerCompatManager {
     
     public static void onCustomResourceLoad(List<PackResources> packs, ReloadableResourceManager resourceManager) {
         if (KUBEJS) {
-            TruePowerKubeJS.onCustomResourceLoad(resourceManager);
+            TruePowerKubeJS.onCustomResourceLoad(packs, resourceManager);
         }
     }
 }
