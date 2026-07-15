@@ -10,6 +10,7 @@ import net.mrqx.truepower.attachment.ITruePowerData;
 import net.mrqx.truepower.network.ComboCancelMessage;
 import net.mrqx.truepower.util.ITruePowerInput;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
@@ -17,7 +18,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 @EventBusSubscriber(Dist.CLIENT)
 public final class MovementEventHandler {
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onMovementInputUpdateEvent(MovementInputUpdateEvent event) {
         Player player = event.getEntity();
         ItemStack itemStack = player.getMainHandItem();

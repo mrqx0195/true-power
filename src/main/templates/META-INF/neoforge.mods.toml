@@ -39,3 +39,9 @@ license="${mod_license}"
     versionRange="${mrqx_slash_blade_core_version_range}"
     ordering="NONE"
     side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="kubejs"
+    mandatory=false
+    ordering="AFTER"
+    side="BOTH"

@@ -10,6 +10,7 @@
   "mixins": [
     "AccessorReloadableResourceManager",
     "AccessorServerPlayer",
+    "AccessorServerScriptManager",
     "MixinAdvancementHelper",
     "MixinAttackManager",
     "MixinComboCommands",
