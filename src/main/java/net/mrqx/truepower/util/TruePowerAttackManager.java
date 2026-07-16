@@ -20,54 +20,54 @@ public class TruePowerAttackManager {
         if (living.level().isClientSide()) {
             return;
         }
-
+        
         Vec3 pos = living.position().add(0.0D, (double) living.getEyeHeight() * 0.75D, 0.0D)
-                .add(living.getLookAngle().scale(0.3f));
-
+            .add(living.getLookAngle().scale(0.3f));
+        
         pos = pos.add(VectorHelper.getVectorForRotation(-90.0F, living.getViewYRot(0)).scale(Vec3.ZERO.y))
-                .add(VectorHelper.getVectorForRotation(0, living.getViewYRot(0) + 90).scale(Vec3.ZERO.z))
-                .add(living.getLookAngle().scale(Vec3.ZERO.z));
-
+            .add(VectorHelper.getVectorForRotation(0, living.getViewYRot(0) + 90).scale(Vec3.ZERO.z))
+            .add(living.getLookAngle().scale(Vec3.ZERO.z));
+        
         EntitySlashEffect jc = getVoidSlashEffect(living, pos);
-
+        
         jc.setDamage(damage);
-
+        
         jc.setKnockBack(KnockBacks.cancel);
-
+        
         living.getCapability(ConcentrationRankCapabilityProvider.RANK_POINT)
-                .ifPresent(rank -> jc.setRank(rank.getRankLevel(living.level().getGameTime())));
-
+            .ifPresent(rank -> jc.setRank(rank.getRankLevel(living.level().getGameTime())));
+        
         jc.setLifetime(36);
-
+        
         living.level().addFreshEntity(jc);
     }
-
+    
     private static EntitySlashEffect getVoidSlashEffect(LivingEntity living, Vec3 pos) {
         EntitySlashEffect jc = new EntitySlashEffect(SlashBlade.RegistryEvents.SlashEffect, living.level()) {
-
+            
             @Override
             public SoundEvent getSlashSound() {
                 return SoundEvents.BLAZE_HURT;
             }
-
+            
             @Override
             protected void tryDespawn() {
                 if (!this.level().isClientSide()) {
                     if (this.getLifetime() < this.tickCount) {
                         this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
-                                SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1.0F,
-                                0.625F + 0.1f * this.random.nextFloat());
+                            SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1.0F,
+                            0.625F + 0.1f * this.random.nextFloat());
                         ((ServerLevel) this.level()).sendParticles(ParticleTypes.ENCHANTED_HIT, this.getX(),
-                                this.getY(), this.getZ(), 16, 0.7, 0.7, 0.7, 0.02);
+                            this.getY(), this.getZ(), 16, 0.7, 0.7, 0.7, 0.02);
                         this.getAlreadyHits().forEach(entity -> {
-
+                            
                             if (entity.isAlive()) {
                                 float yRot = this.getOwner() != null ? this.getOwner().getYRot() : 0;
                                 entity.addDeltaMovement(new Vec3(
-                                        Math.sin(yRot * (float) Math.PI / 180.0F) * 0.5,
-                                        0.05D,
-                                        -Math.cos(yRot * (float) Math.PI / 180.0F) * 0.5));
-
+                                    Math.sin(yRot * (float) Math.PI / 180.0F) * 0.5,
+                                    0.05D,
+                                    -Math.cos(yRot * (float) Math.PI / 180.0F) * 0.5));
+                                
                             }
                         });
                         this.remove(RemovalReason.DISCARDED);
@@ -76,20 +76,74 @@ public class TruePowerAttackManager {
             }
         };
         jc.setPos(pos.x, pos.y, pos.z);
-
+        
         jc.setOwner(living);
-
+        
         jc.setRotationRoll(180);
         jc.setYRot(living.getYRot() - 22.5F);
         jc.setXRot(0);
-
+        
         int colorCode = living.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE)
-                .map(ISlashBladeState::getColorCode).orElse(0xFFFFFF);
+            .map(ISlashBladeState::getColorCode).orElse(0xFFFFFF);
         jc.setColor(colorCode);
-
+        
         jc.setMute(false);
         jc.setIsCritical(false);
-
+        
         return jc;
+    }
+    
+    public static Vec3 maybeBackOffFromEdge(Vec3 vec, LivingEntity mover) {
+        return maybeBackOffFromEdge(vec, mover, true);
+    }
+    
+    public static Vec3 maybeBackOffFromEdge(Vec3 vec, LivingEntity mover, boolean shouldDownStep) {
+        double d0 = vec.x;
+        double d1 = vec.z;
+        float y = shouldDownStep ? -mover.maxUpStep() : 0;
+        
+        while (d0 != 0 && mover.level().noCollision(mover,
+            mover.getBoundingBox().move(d0, y, 0))) {
+            if (d0 < 0.05 && d0 >= -0.05) {
+                d0 = 0;
+            } else if (d0 > 0) {
+                d0 -= 0.05;
+            } else {
+                d0 += 0.05;
+            }
+        }
+        
+        while (d1 != 0 && mover.level().noCollision(mover,
+            mover.getBoundingBox().move(0, y, d1))) {
+            if (d1 < 0.05 && d1 >= -0.05) {
+                d1 = 0;
+            } else if (d1 > 0) {
+                d1 -= 0.05;
+            } else {
+                d1 += 0.05;
+            }
+        }
+        
+        while (d0 != 0 && d1 != 0 && mover.level().noCollision(mover,
+            mover.getBoundingBox().move(d0, y, d1))) {
+            if (d0 < 0.05 && d0 >= -0.05) {
+                d0 = 0;
+            } else if (d0 > 0) {
+                d0 -= 0.05;
+            } else {
+                d0 += 0.05;
+            }
+            
+            if (d1 < 0.05 && d1 >= -0.05) {
+                d1 = 0;
+            } else if (d1 > 0) {
+                d1 -= 0.05;
+            } else {
+                d1 += 0.05;
+            }
+        }
+        
+        vec = new Vec3(d0, vec.y, d1);
+        return vec;
     }
 }

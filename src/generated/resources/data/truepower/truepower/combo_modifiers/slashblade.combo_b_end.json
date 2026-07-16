@@ -10,7 +10,7 @@
     "step": [
       {
         "distance": 1.5,
-        "tick": 0
+        "tick": 7
       }
     ],
     "tickStun": [
@@ -37,6 +37,7 @@
     ]
   },
   "end_frame": 743,
+  "motionLoc": "slashblade:combostate/motion.vmd",
   "name": "slashblade.combo_b_end",
   "priority": 100,
   "start_frame": 720

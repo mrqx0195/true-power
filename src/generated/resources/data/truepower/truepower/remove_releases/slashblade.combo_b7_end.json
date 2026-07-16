@@ -1,5 +1,6 @@
 {
   "end_frame": 787,
+  "motionLoc": "slashblade:combostate/motion.vmd",
   "name": "slashblade.combo_b7_end",
   "priority": 100,
   "start_frame": 764

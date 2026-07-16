@@ -6,6 +6,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
 import net.mrqx.truepower.TruePowerMod;
 
@@ -94,6 +95,7 @@ public final class ComboModifierData {
         int startFrame,
         int endFrame,
         int priority,
+        ResourceLocation motionLoc,
         @Nullable JsonElement behavior
     ) {
         public static final Codec<ComboModifierEntry> CODEC = RecordCodecBuilder.create(instance ->
@@ -102,20 +104,23 @@ public final class ComboModifierData {
                 Codec.INT.fieldOf("start_frame").forGetter(ComboModifierEntry::startFrame),
                 Codec.INT.fieldOf("end_frame").forGetter(ComboModifierEntry::endFrame),
                 Codec.INT.fieldOf("priority").forGetter(ComboModifierEntry::priority),
+                ResourceLocation.CODEC.fieldOf("motionLoc").forGetter(ComboModifierEntry::motionLoc),
                 ExtraCodecs.JSON.optionalFieldOf("behavior").forGetter(e -> Optional.ofNullable(e.behavior))
-            ).apply(instance, (name, startFrame, endFrame, priority, behaviorOpt) ->
-                new ComboModifierEntry(name, startFrame, endFrame, priority, behaviorOpt.orElse(null))
+            ).apply(instance, (name, startFrame, endFrame, priority, motionLoc, behaviorOpt) ->
+                new ComboModifierEntry(name, startFrame, endFrame, priority, motionLoc, behaviorOpt.orElse(null))
             )
         );
     }
     
-    public record RemoveReleaseEntry(String name, int startFrame, int endFrame, int priority) {
+    public record RemoveReleaseEntry(String name, int startFrame, int endFrame, int priority,
+                                     ResourceLocation motionLoc) {
         public static final Codec<RemoveReleaseEntry> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                 Codec.STRING.fieldOf("name").forGetter(RemoveReleaseEntry::name),
                 Codec.INT.fieldOf("start_frame").forGetter(RemoveReleaseEntry::startFrame),
                 Codec.INT.fieldOf("end_frame").forGetter(RemoveReleaseEntry::endFrame),
-                Codec.INT.fieldOf("priority").forGetter(RemoveReleaseEntry::priority)
+                Codec.INT.fieldOf("priority").forGetter(RemoveReleaseEntry::priority),
+                ResourceLocation.CODEC.fieldOf("motionLoc").forGetter(RemoveReleaseEntry::motionLoc)
             ).apply(instance, RemoveReleaseEntry::new)
         );
     }

@@ -6,6 +6,7 @@
     }
   },
   "end_frame": 1210,
+  "motionLoc": "slashblade:combostate/motion.vmd",
   "name": "slashblade.aerial_rave_a2",
   "priority": 80,
   "start_frame": 1200

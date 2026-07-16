@@ -12,6 +12,7 @@
     ]
   },
   "end_frame": 720,
+  "motionLoc": "slashblade:combostate/motion.vmd",
   "name": "slashblade.combo_b1",
   "priority": 100,
   "start_frame": 700

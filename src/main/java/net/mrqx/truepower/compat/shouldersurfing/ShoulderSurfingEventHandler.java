@@ -28,13 +28,14 @@ public class ShoulderSurfingEventHandler {
     
     public static void onForceVanillaPlayerInputEvent(ForceVanillaPlayerInputEvent event) {
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.player != null) {
+        ShoulderSurfing shoulderSurfing = ShoulderSurfing.getInstance();
+        if (minecraft.player != null && shoulderSurfing.isShoulderSurfing()) {
             LocalPlayer player = minecraft.player;
             if (TruePowerComboHelper.hasTargetOrSneak(player) && player.input instanceof ITruePowerInput truePowerInput) {
                 Input input = player.input;
                 Vec2f moveVector = new Vec2f(new Vec2(truePowerInput.true_power$getTruePowerLeftImpulse(), truePowerInput.true_power$getTruePowerForwardImpulse()));
                 float yRot = player.getYRot();
-                Vec2f rotated = moveVector.rotateDegrees(Mth.degreesDifference(yRot, ShoulderSurfing.getInstance().getCamera().getYRot()));
+                Vec2f rotated = moveVector.rotateDegrees(Mth.degreesDifference(yRot, shoulderSurfing.getCamera().getYRot()));
                 
                 if (truePowerInput.true_power$getTruePowerCanMove()) {
                     input.leftImpulse = moveVector.x();

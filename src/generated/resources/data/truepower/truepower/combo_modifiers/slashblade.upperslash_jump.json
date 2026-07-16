@@ -10,6 +10,7 @@
     }
   },
   "end_frame": 1713,
+  "motionLoc": "slashblade:combostate/motion.vmd",
   "name": "slashblade.upperslash_jump",
   "priority": 90,
   "start_frame": 1700

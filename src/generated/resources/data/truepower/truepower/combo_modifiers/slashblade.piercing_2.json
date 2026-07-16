@@ -23,6 +23,7 @@
     ]
   },
   "end_frame": 55,
+  "motionLoc": "slashblade:combostate/piercing.vmd",
   "name": "slashblade.piercing_2",
   "priority": 50,
   "start_frame": 33

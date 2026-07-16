@@ -6,6 +6,7 @@
     }
   },
   "end_frame": 1817,
+  "motionLoc": "slashblade:combostate/motion.vmd",
   "name": "slashblade.aerial_cleave_loop",
   "priority": 70,
   "start_frame": 1812

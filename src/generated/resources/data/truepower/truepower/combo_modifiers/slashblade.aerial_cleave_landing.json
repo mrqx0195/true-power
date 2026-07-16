@@ -6,6 +6,7 @@
     }
   },
   "end_frame": 1859,
+  "motionLoc": "slashblade:combostate/motion.vmd",
   "name": "slashblade.aerial_cleave_landing",
   "priority": 70,
   "start_frame": 1816
