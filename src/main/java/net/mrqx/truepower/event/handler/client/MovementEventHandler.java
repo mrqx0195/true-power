@@ -35,6 +35,7 @@ public final class MovementEventHandler {
             if (!data.isNoMoveEnable()
                 || state.getComboSeq().equals(ComboStateRegistry.NONE.getId())
                 || state.getComboSeq().equals(ComboStateRegistry.STANDBY.getId())) {
+                truePowerInput.true_power$setTruePowerCanMove(true);
                 return;
             }
             if (state.getComboSeq().equals(ResourceLocation.tryParse(data.getCombo()))) {

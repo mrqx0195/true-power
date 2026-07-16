@@ -7,6 +7,7 @@
     "releaseActionQuickCharge": {}
   },
   "end_frame": 281,
+  "motionLoc": "slashblade:combostate/motion.vmd",
   "name": "slashblade.combo_a3_end2",
   "priority": 100,
   "start_frame": 230

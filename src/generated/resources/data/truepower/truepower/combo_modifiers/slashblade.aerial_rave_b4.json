@@ -18,6 +18,7 @@
     ]
   },
   "end_frame": 1537,
+  "motionLoc": "slashblade:combostate/motion.vmd",
   "name": "slashblade.aerial_rave_b4",
   "priority": 80,
   "start_frame": 1500

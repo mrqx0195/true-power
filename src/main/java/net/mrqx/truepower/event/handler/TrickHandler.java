@@ -16,17 +16,15 @@ import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.mrqx.sbr_core.utils.InputStream;
 import net.mrqx.truepower.attachment.ITruePowerData;
 import net.mrqx.truepower.mixin.AccessorServerPlayer;
 import net.mrqx.truepower.util.JustSlashArtManager;
+import net.mrqx.truepower.util.TruePowerAttackManager;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -161,7 +159,7 @@ public final class TrickHandler {
             
             sender.moveRelative(3.0f, input);
             
-            Vec3 motion = maybeBackOffFromEdge(sender.getDeltaMovement(), sender);
+            Vec3 motion = TruePowerAttackManager.maybeBackOffFromEdge(sender.getDeltaMovement(), sender);
             
             sender.playNotifySound(SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.5F, 1.2f);
             
@@ -206,54 +204,5 @@ public final class TrickHandler {
                 sender.setPos(oldPos);
             }
         }
-    }
-    
-    public static Vec3 maybeBackOffFromEdge(Vec3 vec, LivingEntity mover) {
-        double d0 = vec.x;
-        double d1 = vec.z;
-        AABB boundingBox = mover.getBoundingBox();
-        float maxUpStep = mover.maxUpStep();
-        Level level = mover.level();
-        
-        while (d0 != 0 && level.noCollision(mover, boundingBox.move(d0, -maxUpStep, 0))) {
-            if (d0 < 0.05 && d0 >= -0.05) {
-                d0 = 0;
-            } else if (d0 > 0) {
-                d0 -= 0.05;
-            } else {
-                d0 += 0.05;
-            }
-        }
-        
-        while (d1 != 0 && level.noCollision(mover, boundingBox.move(0, -maxUpStep, d1))) {
-            if (d1 < 0.05 && d1 >= -0.05) {
-                d1 = 0;
-            } else if (d1 > 0) {
-                d1 -= 0.05;
-            } else {
-                d1 += 0.05;
-            }
-        }
-        
-        while (d0 != 0 && d1 != 0 && level.noCollision(mover, boundingBox.move(d0, -maxUpStep, d1))) {
-            if (d0 < 0.05 && d0 >= -0.05) {
-                d0 = 0;
-            } else if (d0 > 0) {
-                d0 -= 0.05;
-            } else {
-                d0 += 0.05;
-            }
-            
-            if (d1 < 0.05 && d1 >= -0.05) {
-                d1 = 0;
-            } else if (d1 > 0) {
-                d1 -= 0.05;
-            } else {
-                d1 += 0.05;
-            }
-        }
-        
-        vec = new Vec3(d0, vec.y, d1);
-        return vec;
     }
 }

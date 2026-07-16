@@ -1,9 +1,11 @@
 package net.mrqx.truepower.data.removereleases;
 
+import mods.flammpfeil.slashblade.init.DefaultResources;
 import mods.flammpfeil.slashblade.registry.ComboStateRegistry;
 import mods.flammpfeil.slashblade.registry.combo.ComboState;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.mrqx.truepower.TruePowerMod;
 import net.mrqx.truepower.data.ComboModifierData;
 import net.mrqx.truepower.data.ComboModifierData.RemoveReleaseEntry;
@@ -25,10 +27,14 @@ public final class TruePowerRemoveReleases {
     }
     
     public static EntryHolder build(String name, int startFrame, int endFrame, int priority, Consumer<EntryHolder> consumer) {
+        return build(name, startFrame, endFrame, priority, DefaultResources.ExMotionLocation, consumer);
+    }
+    
+    public static EntryHolder build(String name, int startFrame, int endFrame, int priority, ResourceLocation motionLoc, Consumer<EntryHolder> consumer) {
         ResourceKey<ComboModifierData.RemoveReleaseEntry> key = ResourceKey.create(
             ComboModifierData.REMOVE_RELEASE_REGISTRY_KEY, TruePowerMod.prefix(name));
         ComboModifierData.RemoveReleaseEntry entry = new ComboModifierData.RemoveReleaseEntry(
-            name, startFrame, endFrame, priority);
+            name, startFrame, endFrame, priority, motionLoc);
         EntryHolder holder = new EntryHolder(key, entry);
         consumer.accept(holder);
         return holder;
@@ -36,7 +42,7 @@ public final class TruePowerRemoveReleases {
     
     public static EntryHolder build(DeferredHolder<ComboState, ComboState> combo, Consumer<EntryHolder> consumer) {
         ComboState comboState = combo.get();
-        return build(Objects.requireNonNull(combo.getId()).toLanguageKey(), comboState.getStartFrame(), comboState.getEndFrame(), comboState.getPriority(), consumer);
+        return build(Objects.requireNonNull(combo.getId()).toLanguageKey(), comboState.getStartFrame(), comboState.getEndFrame(), comboState.getPriority(), comboState.getMotionLoc(), consumer);
     }
     
     static {

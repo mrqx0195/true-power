@@ -6,6 +6,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
 import net.mrqx.truepower.TruePowerMod;
 
@@ -17,7 +18,7 @@ public final class ComboModifierData {
         ResourceKey.createRegistryKey(TruePowerMod.prefix("combo_modifiers"));
     public static final ResourceKey<Registry<RemoveReleaseEntry>> REMOVE_RELEASE_REGISTRY_KEY =
         ResourceKey.createRegistryKey(TruePowerMod.prefix("remove_releases"));
-
+    
     public static final String BEHAVIOR_JUMP_VELOCITY_BOOST = "jumpVelocityBoost";
     public static final String BEHAVIOR_AERIAL_RAVE_B3_MULTIHIT = "aerialRaveB3Multihit";
     public static final String BEHAVIOR_ZERO_VELOCITY = "zeroVelocity";
@@ -29,7 +30,7 @@ public final class ComboModifierData {
     public static final String BEHAVIOR_TICK_SHOULD_LOCK_ON = "tickShouldLockOn";
     public static final String BEHAVIOR_TICK_SNAP_LOCK_ON = "tickSnapLockOn";
     public static final String BEHAVIOR_TICK_STUN = "tickStun";
-
+    
     public static final String KEY_CANCEL_ACTION = "cancelAction";
     public static final String KEY_STEP = "step";
     public static final String KEY_FRAME = "frame";
@@ -40,7 +41,7 @@ public final class ComboModifierData {
     public static final String KEY_START = "start";
     public static final String KEY_END = "end";
     public static final String KEY_VALUE = "value";
-
+    
     public static final String PARAM_CHARGE = "charge";
     public static final String PARAM_CHARGE_MIN = "chargeMin";
     public static final String PARAM_CHARGE_MAX = "chargeMax";
@@ -55,37 +56,41 @@ public final class ComboModifierData {
     public static final String PARAM_TICK = "tick";
     public static final String PARAM_STUN_VALUE = "stunValue";
     public static final String PARAM_NEED_POWER = "needPower";
-
+    
     public static int optInt(JsonObject obj, String key, int defaultValue) {
         if (obj.has(key) && obj.get(key).isJsonPrimitive()) {
             return obj.get(key).getAsInt();
         }
         return defaultValue;
     }
-
+    
     public static double optDouble(JsonObject obj, String key, double defaultValue) {
         if (obj.has(key) && obj.get(key).isJsonPrimitive()) {
             return obj.get(key).getAsDouble();
         }
         return defaultValue;
     }
-
+    
     public static String optString(JsonObject obj, String key, String defaultValue) {
         if (obj.has(key) && obj.get(key).isJsonPrimitive()) {
             return obj.get(key).getAsString();
         }
         return defaultValue;
     }
-
+    
     public static boolean optBool(JsonObject obj, String key, boolean defaultValue) {
         if (obj.has(key) && obj.get(key).isJsonPrimitive()) {
             return obj.get(key).getAsBoolean();
         }
         return defaultValue;
     }
-
+    
     public record ComboModifierEntry(
-        String name, int startFrame, int endFrame, int priority,
+        String name,
+        int startFrame,
+        int endFrame,
+        int priority,
+        ResourceLocation motionLoc,
         @Nullable JsonElement behavior
     ) {
         public static final Codec<ComboModifierEntry> CODEC = RecordCodecBuilder.create(instance ->
@@ -94,20 +99,23 @@ public final class ComboModifierData {
                 Codec.INT.fieldOf("start_frame").forGetter(ComboModifierEntry::startFrame),
                 Codec.INT.fieldOf("end_frame").forGetter(ComboModifierEntry::endFrame),
                 Codec.INT.fieldOf("priority").forGetter(ComboModifierEntry::priority),
+                ResourceLocation.CODEC.fieldOf("motionLoc").forGetter(ComboModifierEntry::motionLoc),
                 ExtraCodecs.JSON.optionalFieldOf("behavior").forGetter(e -> Optional.ofNullable(e.behavior))
-            ).apply(instance, (name, startFrame, endFrame, priority, behaviorOpt) ->
-                new ComboModifierEntry(name, startFrame, endFrame, priority, behaviorOpt.orElse(null))
+            ).apply(instance, (name, startFrame, endFrame, priority, motionLoc, behaviorOpt) ->
+                new ComboModifierEntry(name, startFrame, endFrame, priority, motionLoc, behaviorOpt.orElse(null))
             )
         );
     }
-
-    public record RemoveReleaseEntry(String name, int startFrame, int endFrame, int priority) {
+    
+    public record RemoveReleaseEntry(String name, int startFrame, int endFrame, int priority,
+                                     ResourceLocation motionLoc) {
         public static final Codec<RemoveReleaseEntry> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                 Codec.STRING.fieldOf("name").forGetter(RemoveReleaseEntry::name),
                 Codec.INT.fieldOf("start_frame").forGetter(RemoveReleaseEntry::startFrame),
                 Codec.INT.fieldOf("end_frame").forGetter(RemoveReleaseEntry::endFrame),
-                Codec.INT.fieldOf("priority").forGetter(RemoveReleaseEntry::priority)
+                Codec.INT.fieldOf("priority").forGetter(RemoveReleaseEntry::priority),
+                ResourceLocation.CODEC.fieldOf("motionLoc").forGetter(RemoveReleaseEntry::motionLoc)
             ).apply(instance, RemoveReleaseEntry::new)
         );
     }

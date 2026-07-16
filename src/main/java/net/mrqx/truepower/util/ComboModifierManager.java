@@ -33,16 +33,16 @@ public final class ComboModifierManager {
     }
     
     @Nullable
-    public static ComboModifierData.ComboModifierEntry findModifier(int startFrame, int endFrame, int priority) {
-        return MODIFIERS.get(new ModifierKey(startFrame, endFrame, priority));
+    public static ComboModifierData.ComboModifierEntry findModifier(int startFrame, int endFrame, int priority, ResourceLocation motionLoc) {
+        return MODIFIERS.get(new ModifierKey(startFrame, endFrame, priority, motionLoc));
     }
     
     @Nullable
-    public static ComboModifierData.RemoveReleaseEntry findRemoveRelease(int startFrame, int endFrame, int priority) {
-        return REMOVE_RELEASES.get(new ModifierKey(startFrame, endFrame, priority));
+    public static ComboModifierData.RemoveReleaseEntry findRemoveRelease(int startFrame, int endFrame, int priority, ResourceLocation motionLoc) {
+        return REMOVE_RELEASES.get(new ModifierKey(startFrame, endFrame, priority, motionLoc));
     }
     
-    public record ModifierKey(int startFrame, int endFrame, int priority) {
+    public record ModifierKey(int startFrame, int endFrame, int priority, ResourceLocation motionLoc) {
     }
     
     public static class ComboModifierListener extends SimpleJsonResourceReloadListener {
@@ -58,7 +58,7 @@ public final class ComboModifierManager {
                     ComboModifierData.ComboModifierEntry parsed = ComboModifierData.ComboModifierEntry.CODEC
                         .parse(JsonOps.INSTANCE, entry.getValue())
                         .getOrThrow();
-                    MODIFIERS.put(new ModifierKey(parsed.startFrame(), parsed.endFrame(), parsed.priority()), parsed);
+                    MODIFIERS.put(new ModifierKey(parsed.startFrame(), parsed.endFrame(), parsed.priority(), parsed.motionLoc()), parsed);
                 } catch (Exception e) {
                     TruePowerMod.LOGGER.error("Failed to load combo_modifiers entry: {}: {}", entry.getKey(), e.getMessage());
                 }
@@ -79,7 +79,7 @@ public final class ComboModifierManager {
                     ComboModifierData.RemoveReleaseEntry parsed = ComboModifierData.RemoveReleaseEntry.CODEC
                         .parse(JsonOps.INSTANCE, entry.getValue())
                         .getOrThrow();
-                    REMOVE_RELEASES.put(new ModifierKey(parsed.startFrame(), parsed.endFrame(), parsed.priority()), parsed);
+                    REMOVE_RELEASES.put(new ModifierKey(parsed.startFrame(), parsed.endFrame(), parsed.priority(), parsed.motionLoc()), parsed);
                 } catch (Exception e) {
                     TruePowerMod.LOGGER.error("Failed to load remove_releases entry: {}: {}", entry.getKey(), e.getMessage());
                 }

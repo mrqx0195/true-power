@@ -27,6 +27,7 @@
     ]
   },
   "end_frame": 2019,
+  "motionLoc": "slashblade:combostate/motion.vmd",
   "name": "slashblade.rapid_slash",
   "priority": 70,
   "start_frame": 2000

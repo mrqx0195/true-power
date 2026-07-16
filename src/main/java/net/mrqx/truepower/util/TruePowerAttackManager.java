@@ -91,4 +91,58 @@ public class TruePowerAttackManager {
         
         return jc;
     }
+    
+    public static Vec3 maybeBackOffFromEdge(Vec3 vec, LivingEntity mover) {
+        return maybeBackOffFromEdge(vec, mover, true);
+    }
+    
+    public static Vec3 maybeBackOffFromEdge(Vec3 vec, LivingEntity mover, boolean shouldDownStep) {
+        double d0 = vec.x;
+        double d1 = vec.z;
+        float y = shouldDownStep ? -mover.maxUpStep() : 0;
+        
+        while (d0 != 0 && mover.level().noCollision(mover,
+            mover.getBoundingBox().move(d0, y, 0))) {
+            if (d0 < 0.05 && d0 >= -0.05) {
+                d0 = 0;
+            } else if (d0 > 0) {
+                d0 -= 0.05;
+            } else {
+                d0 += 0.05;
+            }
+        }
+        
+        while (d1 != 0 && mover.level().noCollision(mover,
+            mover.getBoundingBox().move(0, y, d1))) {
+            if (d1 < 0.05 && d1 >= -0.05) {
+                d1 = 0;
+            } else if (d1 > 0) {
+                d1 -= 0.05;
+            } else {
+                d1 += 0.05;
+            }
+        }
+        
+        while (d0 != 0 && d1 != 0 && mover.level().noCollision(mover,
+            mover.getBoundingBox().move(d0, y, d1))) {
+            if (d0 < 0.05 && d0 >= -0.05) {
+                d0 = 0;
+            } else if (d0 > 0) {
+                d0 -= 0.05;
+            } else {
+                d0 += 0.05;
+            }
+            
+            if (d1 < 0.05 && d1 >= -0.05) {
+                d1 = 0;
+            } else if (d1 > 0) {
+                d1 -= 0.05;
+            } else {
+                d1 += 0.05;
+            }
+        }
+        
+        vec = new Vec3(d0, vec.y, d1);
+        return vec;
+    }
 }

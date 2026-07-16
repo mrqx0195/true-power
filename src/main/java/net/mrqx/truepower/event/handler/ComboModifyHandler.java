@@ -5,13 +5,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
-import mods.flammpfeil.slashblade.init.DefaultResources;
 import mods.flammpfeil.slashblade.registry.combo.ComboState;
 import mods.flammpfeil.slashblade.slasharts.SlashArts;
 import mods.flammpfeil.slashblade.util.AdvancementHelper;
 import mods.flammpfeil.slashblade.util.AttackManager;
 import mods.flammpfeil.slashblade.util.KnockBacks;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
@@ -24,10 +24,7 @@ import net.mrqx.truepower.data.ComboModifierData;
 import net.mrqx.truepower.entity.EntityBlastSummonedSword;
 import net.mrqx.truepower.event.TruePowerComboModifyEvent;
 import net.mrqx.truepower.network.ComboSyncMessage;
-import net.mrqx.truepower.util.CollideAction;
-import net.mrqx.truepower.util.ComboModifierManager;
-import net.mrqx.truepower.util.RankManager;
-import net.mrqx.truepower.util.TruePowerComboHelper;
+import net.mrqx.truepower.util.*;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModLoader;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -61,19 +58,17 @@ public final class ComboModifyHandler {
         }
         
         ComboModifierData.RemoveReleaseEntry removeRelease =
-            ComboModifierManager.findRemoveRelease(combo.getStartFrame(), combo.getEndFrame(), combo.getPriority());
+            ComboModifierManager.findRemoveRelease(combo.getStartFrame(), combo.getEndFrame(), combo.getPriority(), combo.getMotionLoc());
         if (removeRelease != null) {
             builder.releaseAction((livingEntity, integer) -> SlashArts.ArtsType.Fail);
         }
         
         boolean matched = false;
-        if (combo.getMotionLoc().equals(DefaultResources.ExMotionLocation)) {
-            ComboModifierData.ComboModifierEntry entry =
-                ComboModifierManager.findModifier(combo.getStartFrame(), combo.getEndFrame(), combo.getPriority());
-            if (entry != null) {
-                matched = true;
-                applyEntryBehavior(entry, combo, builder);
-            }
+        ComboModifierData.ComboModifierEntry entry =
+            ComboModifierManager.findModifier(combo.getStartFrame(), combo.getEndFrame(), combo.getPriority(), combo.getMotionLoc());
+        if (entry != null) {
+            matched = true;
+            applyEntryBehavior(entry, combo, builder);
         }
         
         if (!matched) {
@@ -322,10 +317,14 @@ public final class ComboModifyHandler {
     
     public static void step(LivingEntity livingEntity, double step) {
         if (TruePowerCommonConfig.STEP_WHEN_USING_COMBO.get()) {
-            Vec3 input = new Vec3(0, 0, step / 4);
-            livingEntity.moveRelative(1, input);
-            Vec3 motion = TrickHandler.maybeBackOffFromEdge(livingEntity.getDeltaMovement(), livingEntity);
+            Vec3 input = new Vec3(0, 0, 1);
+            livingEntity.moveRelative((float) step, input);
+            Vec3 motion = TruePowerAttackManager.maybeBackOffFromEdge(livingEntity.getDeltaMovement(), livingEntity, false);
             livingEntity.move(MoverType.SELF, motion);
+            MinecraftServer server = livingEntity.getServer();
+            if (server != null) {
+                server.getPlayerList().broadcastAll(new ClientboundSetEntityMotionPacket(livingEntity.getId(), motion));
+            }
         }
     }
     

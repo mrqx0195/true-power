@@ -2,11 +2,13 @@ package net.mrqx.truepower.data.combomodifier;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import mods.flammpfeil.slashblade.init.DefaultResources;
 import mods.flammpfeil.slashblade.registry.ComboStateRegistry;
 import mods.flammpfeil.slashblade.registry.combo.ComboState;
 import mods.flammpfeil.slashblade.util.TimeValueHelper;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.mrqx.truepower.TruePowerMod;
 import net.mrqx.truepower.data.ComboModifierData;
 import net.mrqx.truepower.registry.TruePowerComboStateRegistry;
@@ -109,7 +111,7 @@ public final class TruePowerComboModifiers {
         builder(ComboStateRegistry.COMBO_B_END)
             .behavior(b -> b
                 .cancel(12).jumpCancelOnly()
-                .step(0, 1.5).releaseActionQuickCharge(12)
+                .step(7, 1.5).releaseActionQuickCharge(12)
                 .stun(9, 50)
                 .stun(9, 20, true)
                 .stun(10, 50)
@@ -417,6 +419,7 @@ public final class TruePowerComboModifiers {
         private int startFrame;
         private int endFrame;
         private int priority;
+        private ResourceLocation motionLoc = DefaultResources.ExMotionLocation;
         @Nullable
         private JsonObject behavior;
         
@@ -439,6 +442,10 @@ public final class TruePowerComboModifiers {
             return this;
         }
         
+        public void motionLoc(ResourceLocation motionLoc) {
+            this.motionLoc = motionLoc;
+        }
+        
         public ModifierBuilder behavior() {
             this.behavior = new BehaviorBuilder().build();
             return this;
@@ -453,7 +460,7 @@ public final class TruePowerComboModifiers {
         
         public EntryHolder build(Consumer<EntryHolder> consumer) {
             ResourceKey<ComboModifierData.ComboModifierEntry> key = ResourceKey.create(ComboModifierData.MODIFIER_REGISTRY_KEY, TruePowerMod.prefix(name));
-            ComboModifierData.ComboModifierEntry entry = new ComboModifierData.ComboModifierEntry(name, startFrame, endFrame, priority, behavior);
+            ComboModifierData.ComboModifierEntry entry = new ComboModifierData.ComboModifierEntry(name, startFrame, endFrame, priority, motionLoc, behavior);
             EntryHolder holder = new EntryHolder(key, entry);
             consumer.accept(holder);
             return holder;
@@ -470,6 +477,7 @@ public final class TruePowerComboModifiers {
         builder.startFrame(comboState.getStartFrame());
         builder.endFrame(comboState.getEndFrame());
         builder.priority(comboState.getPriority());
+        builder.motionLoc(comboState.getMotionLoc());
         return builder;
     }
 }

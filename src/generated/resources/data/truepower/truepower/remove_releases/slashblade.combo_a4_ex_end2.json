@@ -1,5 +1,6 @@
 {
   "end_frame": 894,
+  "motionLoc": "slashblade:combostate/motion.vmd",
   "name": "slashblade.combo_a4_ex_end2",
   "priority": 100,
   "start_frame": 877
