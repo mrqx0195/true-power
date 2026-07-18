@@ -17,7 +17,7 @@ public class TruePowerKubeJS {
             List<PackResources> packResources = ServerScriptManager.createPackResources(packs);
             packs.clear();
             packs.addAll(packResources);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             List<PackResources> filePacks = new ArrayList<>();
             KubeFileResourcePack.scanAndLoad(KubeJSPaths.DATA, filePacks);
             filePacks.sort((p1, p2) -> p1.packId().compareToIgnoreCase(p2.packId()));
