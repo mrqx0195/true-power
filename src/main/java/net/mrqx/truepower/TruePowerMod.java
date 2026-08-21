@@ -10,6 +10,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobCategory;
 import net.mrqx.truepower.attachment.TruePowerAttachments;
+import net.mrqx.truepower.compat.TruePowerCompatManager;
 import net.mrqx.truepower.config.TruePowerClientConfig;
 import net.mrqx.truepower.config.TruePowerCommonConfig;
 import net.mrqx.truepower.entity.EntityBlastSummonedSword;
@@ -41,7 +42,9 @@ public class TruePowerMod {
         TruePowerComboStateRegistry.COMBO_STATE.register(modEventBus);
         TruePowerAttachments.ATTACHMENTS.register(modEventBus);
         TruePowerAttributeRegistry.ATTRIBUTES.register(modEventBus);
+        modEventBus.addListener(TruePowerCompatManager::commonInit);
         modEventBus.addListener(TruePowerMod::onEntityAttributeModification);
+        TruePowerCompatManager.onModConstruct(modEventBus, container);
     }
     
     public static void onEntityAttributeModification(EntityAttributeModificationEvent event) {

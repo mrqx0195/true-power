@@ -8,11 +8,13 @@ import mods.flammpfeil.slashblade.entity.Projectile;
 import mods.flammpfeil.slashblade.util.AttackHelper;
 import mods.flammpfeil.slashblade.util.AttackManager;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.mrqx.truepower.config.TruePowerCommonConfig;
+import net.mrqx.truepower.util.TruePowerAttackManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -41,5 +43,15 @@ public abstract class MixinEntityAbstractSummonedSword extends Projectile implem
             return flag.get();
         }
         return original.call(instance, source, amount);
+    }
+    
+    @WrapOperation(method = "onHitEntity(Lnet/minecraft/world/phys/EntityHitResult;)V",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/damagesource/DamageSources;indirectMagic(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/Entity;)Lnet/minecraft/world/damagesource/DamageSource;"
+        ),
+        remap = false)
+    private DamageSource wrapDamageSource(DamageSources instance, Entity causingEntity, Entity directEntity, Operation<DamageSource> original) {
+        return TruePowerAttackManager.getSummonedSwordDamageSource(instance, causingEntity, directEntity);
     }
 }

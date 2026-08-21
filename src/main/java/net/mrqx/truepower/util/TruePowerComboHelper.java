@@ -15,6 +15,7 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.phys.Vec3;
 import net.mrqx.truepower.attachment.ITruePowerData;
 import net.mrqx.truepower.config.TruePowerCommonConfig;
+import org.jetbrains.annotations.Nullable;
 
 public class TruePowerComboHelper {
     public static final ComboState.TimeLineTickAction UPPER_SLASH = ComboState.TimeLineTickAction.getBuilder()
@@ -51,7 +52,14 @@ public class TruePowerComboHelper {
     }
     
     public static CollideAction getCollideAction(Entity entity, ISlashBladeState state) {
+        return getCollideAction(entity, state, null);
+    }
+    
+    public static CollideAction getCollideAction(Entity entity, ISlashBladeState state, @Nullable Entity target) {
         if (!entity.onGround()) {
+            return CollideAction.IGNORE;
+        }
+        if (target != null && !target.onGround()) {
             return CollideAction.IGNORE;
         }
         if (entity instanceof LivingEntity living) {
@@ -91,5 +99,26 @@ public class TruePowerComboHelper {
     public static boolean hasTarget(Entity entity, ISlashBladeState state) {
         Entity target = state.getTargetEntity(entity.level());
         return target != null && target.isAlive();
+    }
+    
+    @Nullable
+    public static Entity getTarget(LivingEntity entity) {
+        return getTarget(entity, entity.getMainHandItem());
+    }
+    
+    @Nullable
+    public static Entity getTarget(Entity entity, ItemStack stack) {
+        if (!stack.isEmpty()) {
+            ISlashBladeState state = BladeStateAccess.of(stack).orElse(null);
+            if (state != null) {
+                return getTarget(entity, state);
+            }
+        }
+        return null;
+    }
+    
+    @Nullable
+    public static Entity getTarget(Entity entity, ISlashBladeState state) {
+        return state.getTargetEntity(entity.level());
     }
 }

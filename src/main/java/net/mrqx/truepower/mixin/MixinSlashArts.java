@@ -5,7 +5,7 @@ import mods.flammpfeil.slashblade.slasharts.SlashArts;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
-import net.mrqx.truepower.util.JustSlashArtManager;
+import net.mrqx.sbr_core.utils.JustSlashArtManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

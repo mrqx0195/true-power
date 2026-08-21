@@ -80,8 +80,7 @@ public class LockOnUtils {
             return true;
         }
         float partialTick = minecraft.getTimer().getGameTimeDeltaPartialTick(true);
-        if (!isInViewCone(cameraPos, bb, minecraft.player.getViewXRot(partialTick),
-            minecraft.player.getViewYRot(partialTick))) {
+        if (!isInViewCone(cameraPos, bb, minecraft.player.getViewXRot(partialTick), minecraft.player.getViewYRot(partialTick))) {
             return false;
         }
         return !isOccluded(level, cameraPos, bb);
@@ -98,6 +97,31 @@ public class LockOnUtils {
             Math.cos(yawRad) * Math.cos(pitchRad));
         
         return toCenter.dot(lookVec) > 0.25;
+    }
+    
+    public static boolean isFullInViewCone(Vec3 cameraPos, AABB bb, float pitch, float yaw) {
+        double pitchRad = Math.toRadians(pitch);
+        double yawRad = Math.toRadians(yaw);
+        Vec3 lookVec = new Vec3(
+            -Math.sin(yawRad) * Math.cos(pitchRad),
+            -Math.sin(pitchRad),
+            Math.cos(yawRad) * Math.cos(pitchRad));
+        Vec3[] corners = {
+            new Vec3(bb.minX, bb.minY, bb.minZ),
+            new Vec3(bb.minX, bb.minY, bb.maxZ),
+            new Vec3(bb.minX, bb.maxY, bb.minZ),
+            new Vec3(bb.minX, bb.maxY, bb.maxZ),
+            new Vec3(bb.maxX, bb.minY, bb.minZ),
+            new Vec3(bb.maxX, bb.minY, bb.maxZ),
+            new Vec3(bb.maxX, bb.maxY, bb.minZ),
+            new Vec3(bb.maxX, bb.maxY, bb.maxZ)
+        };
+        for (Vec3 corner : corners) {
+            if (corner.subtract(cameraPos).normalize().dot(lookVec) <= 0.25) {
+                return false;
+            }
+        }
+        return true;
     }
     
     public static boolean isOccluded(Level level, Vec3 cameraPos, AABB bb) {
@@ -158,5 +182,15 @@ public class LockOnUtils {
         } else {
             return new EntityHitResult(resultEntity);
         }
+    }
+    
+    public static Vec3 getEntityCenterPosition(Entity entity, float partialTick) {
+        Vec3 position = entity.getPosition(partialTick);
+        Vec3 eyePosition = entity.getEyePosition(partialTick);
+        return new Vec3((position.x() + eyePosition.x()) / 2, (position.y() + eyePosition.y()) / 2, (position.z() + eyePosition.z()) / 2);
+    }
+    
+    public static AABB scaleAABB(AABB playerBB, double scale) {
+        return playerBB.inflate(playerBB.getXsize() * scale, playerBB.getYsize() * scale, playerBB.getZsize() * scale);
     }
 }

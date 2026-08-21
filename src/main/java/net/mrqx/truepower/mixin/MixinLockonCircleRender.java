@@ -7,12 +7,15 @@ import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.capability.slashblade.ISlashBladeState;
 import mods.flammpfeil.slashblade.client.renderer.LockonCircleRender;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import net.mrqx.truepower.ClientHandler;
 import net.mrqx.truepower.attachment.ITruePowerData;
 import net.mrqx.truepower.config.TruePowerClientConfig;
+import net.mrqx.truepower.util.LockOnUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -47,5 +50,10 @@ public class MixinLockonCircleRender {
     @WrapOperation(method = "onEntityUpdate(Lnet/neoforged/neoforge/client/event/RenderFrameEvent$Pre;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isAlive()Z"), remap = false)
     private static boolean wrapIsClientSide(Entity instance, Operation<Boolean> original, @Local(name = "player") LocalPlayer player, @Local(name = "stack") ItemStack stack) {
         return original.call(instance) && BladeStateAccess.of(stack).map(s -> ClientHandler.shouldLockOnRot(player, s)).orElse(true);
+    }
+    
+    @WrapOperation(method = "onEntityUpdate(Lnet/neoforged/neoforge/client/event/RenderFrameEvent$Pre;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;lookAt(Lnet/minecraft/commands/arguments/EntityAnchorArgument$Anchor;Lnet/minecraft/world/phys/Vec3;)V"), remap = false)
+    private static void wrapLookAt(LocalPlayer instance, EntityAnchorArgument.Anchor anchor, Vec3 vec3, Operation<Void> original, @Local(name = "target") Entity target, @Local(name = "partialTicks") float partialTicks) {
+        original.call(instance, anchor, LockOnUtils.getEntityCenterPosition(target, partialTicks));
     }
 }

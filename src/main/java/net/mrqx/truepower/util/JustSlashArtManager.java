@@ -2,41 +2,29 @@ package net.mrqx.truepower.util;
 
 import net.minecraft.world.entity.LivingEntity;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
+/**
+ * Use {@link net.mrqx.sbr_core.utils.JustSlashArtManager} instead.
+ */
+@SuppressWarnings("unused")
+@Deprecated
 public class JustSlashArtManager {
-    private static final Map<UUID, Integer> JUST_COUNTER = new HashMap<>();
-    private static final Map<UUID, Long> JUST_COOLDOWN_COUNTER = new HashMap<>();
-    
     public static int addJustCount(LivingEntity livingEntity) {
-        if (!JUST_COUNTER.containsKey(livingEntity.getUUID())) {
-            JUST_COUNTER.put(livingEntity.getUUID(), 0);
-        }
-        JUST_COUNTER.put(livingEntity.getUUID(), JUST_COUNTER.get(livingEntity.getUUID()) + 1);
-        return JUST_COUNTER.get(livingEntity.getUUID());
+        return net.mrqx.sbr_core.utils.JustSlashArtManager.addJustCount(livingEntity);
     }
     
     public static int getJustCount(LivingEntity livingEntity) {
-        if (!JUST_COUNTER.containsKey(livingEntity.getUUID())) {
-            JUST_COUNTER.put(livingEntity.getUUID(), 0);
-        }
-        return JUST_COUNTER.get(livingEntity.getUUID());
+        return net.mrqx.sbr_core.utils.JustSlashArtManager.getJustCount(livingEntity);
     }
     
     public static void resetJustCount(LivingEntity livingEntity) {
-        JUST_COUNTER.put(livingEntity.getUUID(), 0);
+        net.mrqx.sbr_core.utils.JustSlashArtManager.resetJustCount(livingEntity);
     }
     
     public static long getJustCooldown(LivingEntity livingEntity) {
-        if (!JUST_COOLDOWN_COUNTER.containsKey(livingEntity.getUUID())) {
-            JUST_COOLDOWN_COUNTER.put(livingEntity.getUUID(), 0L);
-        }
-        return JUST_COOLDOWN_COUNTER.get(livingEntity.getUUID());
+        return net.mrqx.sbr_core.utils.JustSlashArtManager.getJustCooldown(livingEntity);
     }
     
     public static void setJustCooldown(LivingEntity livingEntity, long cooldown) {
-        JUST_COOLDOWN_COUNTER.put(livingEntity.getUUID(), cooldown);
+        net.mrqx.sbr_core.utils.JustSlashArtManager.setJustCooldown(livingEntity, cooldown);
     }
 }

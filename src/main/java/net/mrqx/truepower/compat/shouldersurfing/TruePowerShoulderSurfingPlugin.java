@@ -10,8 +10,11 @@ import net.neoforged.api.distmarker.OnlyIn;
 public class TruePowerShoulderSurfingPlugin implements IShoulderSurfingPlugin {
     @Override
     public void register(IEventBus eventBus) {
+        eventBus.register(ShoulderSurfingEventHandler::onTickEvent);
         eventBus.register(ShoulderSurfingEventHandler::onComputeCameraCouplingEvent);
         eventBus.register(ShoulderSurfingEventHandler::onForceVanillaPlayerInputEvent);
+        eventBus.register(ShoulderSurfingEventHandler::onComputeTargetCameraOffsetEvent);
+        eventBus.register(ShoulderSurfingEventHandler::onComputePlayerAimStateEvent);
         eventBus.register(ShoulderSurfingEventHandler::onComputePlayerUseItemStateEvent);
         eventBus.register(ShoulderSurfingEventHandler::onComputePlayerInteractionStateEvent);
         eventBus.register(ShoulderSurfingEventHandler::onComputePlayerAttackStateEvent);

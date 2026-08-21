@@ -12,6 +12,12 @@ license="${mod_license}"
 [[mixins]]
     config="${mod_id}.mixins.json"
 
+[[mixins]]
+    config="${mod_id}.shouldersurfing.mixins.json"
+
+[[mixins]]
+    config="${mod_id}.epicfight.mixins.json"
+
 [[dependencies.${mod_id}]]
     modId="neoforge"
     type="required"
@@ -30,7 +36,7 @@ license="${mod_license}"
     modId="slashblade"
     type="required"
     versionRange="${slash_blade_version_range}"
-    ordering="NONE"
+    ordering="AFTER"
     side="BOTH"
 
 [[dependencies.${mod_id}]]
@@ -45,3 +51,7 @@ license="${mod_license}"
     type="optional"
     ordering="AFTER"
     side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="fabric_api"
+    type="incompatible"

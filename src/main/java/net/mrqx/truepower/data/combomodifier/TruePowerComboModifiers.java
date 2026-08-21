@@ -201,6 +201,9 @@ public final class TruePowerComboModifiers {
         builder(ComboStateRegistry.RAPID_SLASH_END)
             .behavior(BehaviorBuilder::clickSummonBlastSword)
             .build(ENTRIES::add);
+        builder(ComboStateRegistry.RAPID_SLASH_QUICK)
+            .behavior()
+            .build(ENTRIES::add);
         
         builder(ComboStateRegistry.RISING_STAR)
             .behavior(b -> b

@@ -34,7 +34,7 @@ public abstract class MixinEntity {
             ItemStack itemStack = livingEntity.getMainHandItem();
             if (!itemStack.isEmpty()) {
                 BladeStateAccess.of(itemStack).ifPresent(state -> {
-                    if (entity instanceof LivingEntity && TruePowerComboHelper.getCollideAction(livingEntity, state).equals(CollideAction.SOLID)) {
+                    if (entity instanceof LivingEntity && TruePowerComboHelper.getCollideAction(livingEntity, state, entity).equals(CollideAction.SOLID)) {
                         cir.setReturnValue(true);
                     }
                 });

@@ -1,4 +1,4 @@
-// 1.21.1	2026-07-17T03:21:44.1228211	TruePower Combo Modifiers
+// 1.21.1	2026-08-03T21:36:30.4495705	TruePower Combo Modifiers
 5a64ac4ec1c73eda0d51ad071b7f658b8495f3be data/truepower/truepower/combo_modifiers/slashblade.aerial_cleave.json
 65384719041c9393668195ea8bf2cd96198dc777 data/truepower/truepower/combo_modifiers/slashblade.aerial_cleave_landing.json
 42f864971402251760ae78182343d659ff3e5bc2 data/truepower/truepower/combo_modifiers/slashblade.aerial_cleave_loop.json
@@ -29,8 +29,9 @@ b49878efcb02cef8892ea8aa8cb18556ddf16797 data/truepower/truepower/combo_modifier
 a90b063bbd3570a6f3c7cd71d202772c56b698fd data/truepower/truepower/combo_modifiers/slashblade.piercing_2.json
 9177d8d778c762a0fd335e794fa4b484582dbcd5 data/truepower/truepower/combo_modifiers/slashblade.rapid_slash.json
 33674e3e1319b75866897c47e8f7d4abd754dae2 data/truepower/truepower/combo_modifiers/slashblade.rapid_slash_end.json
+867b250ba14073d78c73639a8488947e6869cc1f data/truepower/truepower/combo_modifiers/slashblade.rapid_slash_quick.json
 f58a50d57c112ff078d429190dff05a600f29981 data/truepower/truepower/combo_modifiers/slashblade.rising_star.json
 e39191db0573ade8c9ae8873b9221277aa7c2efc data/truepower/truepower/combo_modifiers/slashblade.upperslash.json
 42c7dbcdf3701fbf253125eeea1254317941cdc7 data/truepower/truepower/combo_modifiers/slashblade.upperslash_jump.json
 0c76d96c9ada3d8cf1383d4922d131f7b55d6b66 data/truepower/truepower/combo_modifiers/slashblade.void_slash.json
-98f0c10a74409c592ce651744ea4997b8d94bbd5 data/truepower/truepower/combo_modifiers/truepower.void_slash.json
+cf3302ef34f973422b4024c695193d1624d629f3 data/truepower/truepower/combo_modifiers/truepower.void_slash.json

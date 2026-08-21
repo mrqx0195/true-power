@@ -25,21 +25,21 @@ public class EntityBlastSummonedSword extends EntityAbstractSummonedSword {
     private static final Map<UUID, List<LivingEntity>> PRE_SUMMON_MAP = new HashMap<>();
     private static final Map<UUID, List<EntityBlastSummonedSword>> PRE_BLAST_SWORD = new HashMap<>();
     
-    public static List<LivingEntity> getPreSummonSwordList(LivingEntity owner) {
+    public synchronized static List<LivingEntity> getPreSummonSwordList(LivingEntity owner) {
         if (!PRE_SUMMON_MAP.containsKey(owner.getUUID())) {
             PRE_SUMMON_MAP.put(owner.getUUID(), new ArrayList<>());
         }
         return PRE_SUMMON_MAP.get(owner.getUUID());
     }
     
-    public static List<EntityBlastSummonedSword> getPreBlastSwordList(LivingEntity owner) {
+    public synchronized static List<EntityBlastSummonedSword> getPreBlastSwordList(LivingEntity owner) {
         if (!PRE_BLAST_SWORD.containsKey(owner.getUUID())) {
             PRE_BLAST_SWORD.put(owner.getUUID(), new ArrayList<>());
         }
         return PRE_BLAST_SWORD.get(owner.getUUID());
     }
     
-    public static void setPreBlastSwordList(LivingEntity owner, final int count) {
+    public synchronized static void setPreBlastSwordList(LivingEntity owner, final int count) {
         ItemStack itemStack = owner.getMainHandItem();
         if (itemStack.isEmpty()) {
             return;

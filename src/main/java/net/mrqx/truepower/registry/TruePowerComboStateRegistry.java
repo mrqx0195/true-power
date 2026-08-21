@@ -12,12 +12,12 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 @SuppressWarnings("unused")
-public class TruePowerComboStateRegistry {
+public final class TruePowerComboStateRegistry {
     public static final DeferredRegister<ComboState> COMBO_STATE = DeferredRegister.create(ComboState.REGISTRY_KEY,
         TruePowerMod.MODID);
     
     public static final DeferredHolder<ComboState, ComboState> VOID_SLASH = COMBO_STATE.register("void_slash", ComboState.Builder
-        .newInstance().startAndEnd(2200, 2277).priority(500).speed(1.0F)
+        .newInstance().startAndEnd(2200, 2277).priority(50).speed(1.0F)
         .next(entity -> TruePowerMod.prefix("void_slash"))
         .nextOfTimeout(entity -> TruePowerMod.prefix("void_slash_sheath"))
         .addTickAction(entity -> entity.setDeltaMovement(0, entity.getDeltaMovement().y, 0))

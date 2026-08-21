@@ -13,6 +13,7 @@ import mods.flammpfeil.slashblade.util.InputCommand;
 import mods.flammpfeil.slashblade.util.NBTHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -21,29 +22,23 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.mrqx.sbr_core.utils.InputStream;
+import net.mrqx.sbr_core.utils.JustSlashArtManager;
 import net.mrqx.truepower.attachment.ITruePowerData;
+import net.mrqx.truepower.config.TruePowerCommonConfig;
 import net.mrqx.truepower.mixin.AccessorServerPlayer;
-import net.mrqx.truepower.util.JustSlashArtManager;
 import net.mrqx.truepower.util.TruePowerAttackManager;
+import net.mrqx.truepower.util.TruePowerInputTimeLines;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.EnumSet;
-import java.util.LinkedList;
 import java.util.Optional;
 
 @EventBusSubscriber
 public final class TrickHandler {
     static final int TRICK_UNTOUCHABLE_TIME = 10;
-    
-    private static final LinkedList<InputStream.TimeLineKeyInput> TRICK_DOWN_INPUT_TIME_LINE = new LinkedList<>();
-    
-    static {
-        TRICK_DOWN_INPUT_TIME_LINE.add(new InputStream.TimeLineKeyInput(5, 0, InputCommand.FORWARD, EnumSet.noneOf(InputCommand.class), InputStream.InputType.START));
-        TRICK_DOWN_INPUT_TIME_LINE.add(new InputStream.TimeLineKeyInput(5, 0, InputCommand.BACK, EnumSet.noneOf(InputCommand.class), InputStream.InputType.START));
-    }
     
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void trickDown(InputCommandEvent event) {
@@ -58,14 +53,16 @@ public final class TrickHandler {
         }
         ISlashBladeState bladeState = bladeStateOptional.get();
         
-        InputStream inputStream = InputStream.getOrCreateInputStream(sender);
-        
         if (bladeState.isBroken() || bladeState.isSealed() || !SwordType.from(blade).contains(SwordType.BEWITCHED) || data.getAvoidTrick() > 0) {
             return;
         }
         
         boolean onDown = !old.contains(InputCommand.SPRINT) && current.contains(InputCommand.SPRINT)
-            && inputStream.checkTimeLineInput(TRICK_DOWN_INPUT_TIME_LINE);
+            && (InputStream.getOrCreateInputStream(sender).checkTimeLineInput(
+            TruePowerCommonConfig.EASY_TRICK_DOWN.get()
+                ? TruePowerInputTimeLines.EASY_TRICK_DOWN_INPUT_TIME_LINE
+                : TruePowerInputTimeLines.TRICK_DOWN_INPUT_TIME_LINE
+        ));
         
         if (!onDown) {
             return;
@@ -157,7 +154,7 @@ public final class TrickHandler {
             
             Vec3 input = new Vec3(0, 0, -1);
             
-            sender.moveRelative(3.0f, input);
+            sender.moveRelative(1.0f, input);
             
             Vec3 motion = TruePowerAttackManager.maybeBackOffFromEdge(sender.getDeltaMovement(), sender);
             
@@ -166,7 +163,10 @@ public final class TrickHandler {
             sender.move(MoverType.SELF, motion);
             ((AccessorServerPlayer) sender).setIsChangingDimension(true);
             
-            sender.connection.send(new ClientboundSetEntityMotionPacket(sender.getId(), motion.scale(0.5)));
+            MinecraftServer server = sender.getServer();
+            if (server != null) {
+                server.getPlayerList().broadcastAll(new ClientboundSetEntityMotionPacket(sender.getId(), motion));
+            }
             
             data.setAvoidTrick(2);
             data.setTrickDowning(true);
@@ -187,7 +187,10 @@ public final class TrickHandler {
                 Untouchable.setUntouchable(sender, TRICK_UNTOUCHABLE_TIME);
                 ((AccessorServerPlayer) sender).setIsChangingDimension(true);
                 
-                sender.connection.send(new ClientboundSetEntityMotionPacket(sender.getId(), motion.scale(0.75)));
+                MinecraftServer server = sender.getServer();
+                if (server != null) {
+                    server.getPlayerList().broadcastAll(new ClientboundSetEntityMotionPacket(sender));
+                }
                 
                 data.setAvoidTrick(2);
                 data.setTrickDowning(true);

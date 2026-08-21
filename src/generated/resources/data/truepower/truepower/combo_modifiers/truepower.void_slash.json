@@ -8,6 +8,6 @@
   "end_frame": 2277,
   "motionLoc": "slashblade:combostate/motion.vmd",
   "name": "truepower.void_slash",
-  "priority": 500,
+  "priority": 50,
   "start_frame": 2200
 }

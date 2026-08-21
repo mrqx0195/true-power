@@ -7,6 +7,7 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
 import net.mrqx.truepower.attachment.ITruePowerStunData;
+import net.mrqx.truepower.config.TruePowerCommonConfig;
 
 import java.util.EnumSet;
 
@@ -31,12 +32,14 @@ public class TruePowerStunGoal extends Goal {
     @SuppressWarnings("DataFlowIssue")
     @Override
     public void tick() {
-        this.entity.setLastHurtByMob(null);
-        this.entity.setLastHurtMob(null);
-        this.entity.setLastHurtByPlayer(null);
-        this.entity.getBrain().clearMemories();
-        if (this.entity instanceof PathfinderMob pathfinderMob) {
-            pathfinderMob.setTarget(null);
+        if (TruePowerCommonConfig.POWERFUL_STUN.get()) {
+            this.entity.setLastHurtByMob(null);
+            this.entity.setLastHurtMob(null);
+            this.entity.setLastHurtByPlayer(null);
+            this.entity.getBrain().clearMemories();
+            if (this.entity instanceof PathfinderMob pathfinderMob) {
+                pathfinderMob.setTarget(null);
+            }
         }
         ITruePowerStunData data = ITruePowerStunData.get(this.entity);
         data.resetStunValue();

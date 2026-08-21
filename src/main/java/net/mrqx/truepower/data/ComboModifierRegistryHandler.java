@@ -3,8 +3,8 @@ package net.mrqx.truepower.data;
 import net.mrqx.truepower.util.ComboModifierManager;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLConstructModEvent;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
+import net.neoforged.neoforge.registries.NewRegistryEvent;
 
 @EventBusSubscriber
 public final class ComboModifierRegistryHandler {
@@ -12,7 +12,7 @@ public final class ComboModifierRegistryHandler {
     }
     
     @SubscribeEvent
-    public static void onConstructMod(FMLConstructModEvent event) {
+    public static void onInit(NewRegistryEvent event) {
         ComboModifierManager.init();
     }
     

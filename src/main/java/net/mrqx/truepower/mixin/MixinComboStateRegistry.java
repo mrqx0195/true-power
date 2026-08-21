@@ -106,12 +106,12 @@ public abstract class MixinComboStateRegistry {
     
     @WrapOperation(method = "/lambda\\$static\\$(197|201)/", at = @At(value = "INVOKE", target = "Lmods/flammpfeil/slashblade/util/AttackManager;areaAttack(Lnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;FZZZ)Ljava/util/List;", remap = false), remap = false)
     private static List<Entity> modifyAerialCleaveAreaAttack(LivingEntity playerIn, Consumer<LivingEntity> beforeHit, float comboRatio, boolean forceHit, boolean resetHit, boolean mute, Operation<List<Entity>> original) {
-        return original.call(playerIn, beforeHit, 0.5f, forceHit, resetHit, mute);
+        return original.call(playerIn, beforeHit, 0.25f, forceHit, resetHit, mute);
     }
     
     @WrapOperation(method = "/lambda\\$static\\$(197|201|205)/", at = @At(value = "INVOKE", target = "Lmods/flammpfeil/slashblade/util/AttackManager;doSlash(Lnet/minecraft/world/entity/LivingEntity;FLnet/minecraft/world/phys/Vec3;ZZDLmods/flammpfeil/slashblade/util/KnockBacks;)Lmods/flammpfeil/slashblade/entity/EntitySlashEffect;", remap = false), remap = false)
     private static EntitySlashEffect modifyAerialCleaveDoSlash(LivingEntity playerIn, float roll, Vec3 centerOffset, boolean mute, boolean critical, double comboRatio, KnockBacks knockback, Operation<EntitySlashEffect> original) {
-        return original.call(playerIn, roll, centerOffset, mute, critical, 2.0, knockback);
+        return original.call(playerIn, roll, centerOffset, mute, critical, 1.0, knockback);
     }
     
     @WrapOperation(method = "lambda$static$211", at = @At(value = "INVOKE", target = "Lmods/flammpfeil/slashblade/util/AttackManager;areaAttack(Lnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;FZZZ)Ljava/util/List;", remap = false), remap = false)

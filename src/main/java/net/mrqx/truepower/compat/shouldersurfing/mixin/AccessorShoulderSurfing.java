@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface AccessorShoulderSurfing {
     @Accessor("playerXRotO")
     void setPlayerXRotO(float playerXRotO);
-
+    
     @Accessor("playerYRotO")
     void setPlayerYRotO(float playerYRotO);
 }

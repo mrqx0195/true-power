@@ -1,13 +1,14 @@
 package net.mrqx.truepower.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import mods.flammpfeil.slashblade.registry.combo.ComboCommands;
 import mods.flammpfeil.slashblade.util.InputCommand;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
-import net.mrqx.truepower.combo.VoidSlashHandler;
-import net.mrqx.truepower.registry.TruePowerComboStateRegistry;
-import net.mrqx.truepower.util.JustSlashArtManager;
+import net.mrqx.truepower.combo.ComboCommandsHandler;
+import net.mrqx.truepower.config.TruePowerCommonConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,9 +24,18 @@ public abstract class MixinComboCommands {
         remap = false,
         cancellable = true)
     private static void injectInitStandByCommand(LivingEntity a, Map<EnumSet<InputCommand>, ResourceLocation> map, CallbackInfoReturnable<ResourceLocation> cir, @Local(name = "commands") EnumSet<InputCommand> commands) {
-        if (VoidSlashHandler.doVoidSlash(a, commands)) {
-            JustSlashArtManager.resetJustCount(a);
-            cir.setReturnValue(TruePowerComboStateRegistry.VOID_SLASH.getId());
+        ResourceLocation resourceLocation = ComboCommandsHandler.processComboCommand(a, commands);
+        if (resourceLocation != null) {
+            cir.setReturnValue(resourceLocation);
         }
+    }
+    
+    @SuppressWarnings("unchecked")
+    @WrapOperation(method = "initDefaultStandByCommands()V", at = @At(value = "INVOKE", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", remap = false), remap = false)
+    private static Object injectInitDefaultStandByCommands(Map<EnumSet<InputCommand>, ResourceLocation> instance, Object k, Object v, Operation<Object> original) {
+        if (!TruePowerCommonConfig.BLADE_ARTS_NEED_SHIFT.get()) {
+            ((EnumSet<InputCommand>) k).remove(InputCommand.SNEAK);
+        }
+        return original.call(instance, k, v);
     }
 }

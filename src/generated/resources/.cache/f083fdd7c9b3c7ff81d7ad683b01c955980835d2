@@ -1,0 +1,6 @@
+// 1.21.1	2026-07-26T17:02:40.8957012	Tags for minecraft:damage_type mod id truepower
+11766fce100e2f602d6c1e3e6989ae0cdf558987 data/minecraft/tags/damage_type/bypasses_armor.json
+11766fce100e2f602d6c1e3e6989ae0cdf558987 data/minecraft/tags/damage_type/bypasses_cooldown.json
+11766fce100e2f602d6c1e3e6989ae0cdf558987 data/minecraft/tags/damage_type/bypasses_wolf_armor.json
+11766fce100e2f602d6c1e3e6989ae0cdf558987 data/minecraft/tags/damage_type/no_knockback.json
+11766fce100e2f602d6c1e3e6989ae0cdf558987 data/minecraft/tags/damage_type/panic_causes.json

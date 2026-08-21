@@ -1,6 +1,5 @@
 package net.mrqx.truepower.event.handler;
 
-import com.google.common.collect.Maps;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -32,8 +31,6 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 
 @EventBusSubscriber
 public final class ComboModifyHandler {
@@ -94,8 +91,7 @@ public final class ComboModifyHandler {
         
         if (behavior.has(ComboModifierData.KEY_STEP)) {
             JsonArray steps = behavior.getAsJsonArray(ComboModifierData.KEY_STEP);
-            AdditionalTimeLineTickAction.Builder timelineBuilder =
-                AdditionalTimeLineTickAction.getBuilder();
+            ComboState.TimeLineTickAction.TimeLineTickActionBuilder timelineBuilder = ComboState.TimeLineTickAction.getBuilder();
             for (JsonElement stepEl : steps) {
                 if (stepEl.isJsonObject()) {
                     JsonObject stepObj = stepEl.getAsJsonObject();
@@ -134,8 +130,7 @@ public final class ComboModifyHandler {
             int count = ComboModifierData.optInt(config, ComboModifierData.PARAM_COUNT, 4);
             double angle = ComboModifierData.optDouble(config, ComboModifierData.PARAM_ANGLE, 180 + 57);
             double damage = ComboModifierData.optDouble(config, ComboModifierData.PARAM_DAMAGE, 0.4);
-            AdditionalTimeLineTickAction.Builder timelineBuilder =
-                AdditionalTimeLineTickAction.getBuilder();
+            ComboState.TimeLineTickAction.TimeLineTickActionBuilder timelineBuilder = ComboState.TimeLineTickAction.getBuilder();
             for (int i = 0; i < count; i++) {
                 final int tick = startTick + i;
                 timelineBuilder.put(tick, (entityIn) ->
@@ -243,8 +238,7 @@ public final class ComboModifyHandler {
         
         if (behavior.has(ComboModifierData.BEHAVIOR_TICK_STUN)) {
             JsonArray stuns = behavior.getAsJsonArray(ComboModifierData.BEHAVIOR_TICK_STUN);
-            AdditionalTimeLineTickAction.Builder timelineBuilder =
-                AdditionalTimeLineTickAction.getBuilder();
+            ComboState.TimeLineTickAction.TimeLineTickActionBuilder timelineBuilder = ComboState.TimeLineTickAction.getBuilder();
             for (JsonElement stunEl : stuns) {
                 if (stunEl.isJsonObject()) {
                     JsonObject stunObj = stunEl.getAsJsonObject();
@@ -317,9 +311,12 @@ public final class ComboModifyHandler {
     
     public static void step(LivingEntity livingEntity, double step) {
         if (TruePowerCommonConfig.STEP_WHEN_USING_COMBO.get()) {
+            if (livingEntity.level().isClientSide) {
+                return;
+            }
             Vec3 input = new Vec3(0, 0, 1);
-            livingEntity.moveRelative((float) step, input);
-            Vec3 motion = TruePowerAttackManager.maybeBackOffFromEdge(livingEntity.getDeltaMovement(), livingEntity, false);
+            livingEntity.moveRelative((float) step / 2, input);
+            Vec3 motion = TruePowerAttackManager.maybeBackOffFromEdge(livingEntity.getDeltaMovement(), livingEntity);
             livingEntity.move(MoverType.SELF, motion);
             MinecraftServer server = livingEntity.getServer();
             if (server != null) {
@@ -340,49 +337,6 @@ public final class ComboModifyHandler {
                 .map(e -> (LivingEntity) e)
                 .map(ITruePowerStunData::get)
                 .forEach(data -> data.addStunValue(livingEntity, stunValue));
-        }
-    }
-    
-    // TODO: 移到前置
-    public static class AdditionalTimeLineTickAction implements Consumer<LivingEntity> {
-        public static Builder getBuilder() {
-            return new Builder();
-        }
-        
-        public static class Builder {
-            Map<Integer, Consumer<LivingEntity>> timeLine = Maps.newHashMap();
-            
-            public Builder put(int ticks, Consumer<LivingEntity> action) {
-                timeLine.put(ticks, action);
-                return this;
-            }
-            
-            public AdditionalTimeLineTickAction build() {
-                return new AdditionalTimeLineTickAction(timeLine);
-            }
-        }
-        
-        Map<Integer, Consumer<LivingEntity>> timeLine = Maps.newHashMap();
-        
-        public AdditionalTimeLineTickAction(Map<Integer, Consumer<LivingEntity>> timeLine) {
-            this.timeLine.putAll(timeLine);
-        }
-        
-        @Override
-        public void accept(LivingEntity livingEntity) {
-            long elapsed = ComboState.getElapsed(livingEntity);
-            int adjustElapsed = (int) elapsed - 1;
-            
-            BladeStateAccess.of(livingEntity.getMainHandItem()).ifPresent(state -> {
-                if (state.getLastProcessedComboTick() != -1 && state.getLastProcessedComboTick() != adjustElapsed) {
-                    return;
-                }
-                
-                Consumer<LivingEntity> action = timeLine.get(adjustElapsed);
-                if (action != null) {
-                    action.accept(livingEntity);
-                }
-            });
         }
     }
 }

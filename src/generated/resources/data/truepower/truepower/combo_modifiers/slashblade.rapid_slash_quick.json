@@ -1,0 +1,13 @@
+{
+  "behavior": {
+    "cancelAction": {
+      "frame": -1,
+      "jumpOnly": false
+    }
+  },
+  "end_frame": 2001,
+  "motionLoc": "slashblade:combostate/motion.vmd",
+  "name": "slashblade.rapid_slash_quick",
+  "priority": 70,
+  "start_frame": 2000
+}

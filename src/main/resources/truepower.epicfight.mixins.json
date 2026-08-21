@@ -1,0 +1,15 @@
+{
+  "client": [
+  ],
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "mixins": [
+    "MixinAttackHelper",
+    "MixinPlayerPatch",
+    "MixinTruePowerAttackManager"
+  ],
+  "package": "net.mrqx.truepower.compat.epicfight.mixin",
+  "plugin": "net.mrqx.truepower.compat.epicfight.EpicFightMixinPlugin",
+  "refmap": "truepower.refmap.json",
+  "required": true
+}

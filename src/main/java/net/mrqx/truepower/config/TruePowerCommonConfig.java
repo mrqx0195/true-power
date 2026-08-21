@@ -18,13 +18,18 @@ public class TruePowerCommonConfig {
     public static final ModConfigSpec.DoubleValue POWERED_VOID_SLASH_DAMAGE_FIRST;
     public static final ModConfigSpec.DoubleValue POWERED_VOID_SLASH_DAMAGE_SECOND;
     public static final ModConfigSpec.IntValue JUDGEMENT_CUT_EXTRA_TARGET;
-    public static final ModConfigSpec.BooleanValue ENABLE_STUN_VALUE;
+    public static final ModConfigSpec.BooleanValue BLADE_ARTS_NEED_SHIFT;
+    public static final ModConfigSpec.BooleanValue ENABLE_PRE_INPUT;
     
     public static final ModConfigSpec.BooleanValue MODIFY_SUMMONED_SWORD_DAMAGE;
     public static final ModConfigSpec.DoubleValue SUMMONED_SWORD_DAMAGE_MULTIPLIER;
     
+    public static final ModConfigSpec.BooleanValue EASY_TRICK_DOWN;
+    
     public static final ModConfigSpec.EnumValue<CollideAction> COLLIDE_ACTION;
     public static final ModConfigSpec.BooleanValue STEP_WHEN_USING_COMBO;
+    public static final ModConfigSpec.BooleanValue ENABLE_STUN_VALUE;
+    public static final ModConfigSpec.BooleanValue POWERFUL_STUN;
     
     static {
         ModConfigSpec.Builder commonBuilder = new ModConfigSpec.Builder();
@@ -86,9 +91,13 @@ public class TruePowerCommonConfig {
                 .comment("Set the additional number of targets for Judgement Cut while player is powered. (default: 2)")
                 .defineInRange("judgement_cut_extra_target", 2, 0, Integer.MAX_VALUE);
             
-            ENABLE_STUN_VALUE = commonBuilder
-                .comment("Enable TruePower's custom stun value system (default: true)")
-                .define("enable_stun_value", true);
+            BLADE_ARTS_NEED_SHIFT = commonBuilder
+                .comment("If it is set to false, some Blade Arts that require shift (such as Rapid Slash) will no longer require holding down shift. (default: false)")
+                .define("blade_arts_need_shift", false);
+            
+            ENABLE_PRE_INPUT = commonBuilder
+                .comment("Enable TruePower's pre-input (or Input Buffering) system . (default: true)")
+                .define("enable_pre_input", true);
         }
         {
             commonBuilder.pop()
@@ -104,6 +113,14 @@ public class TruePowerCommonConfig {
         }
         {
             commonBuilder.pop()
+                .push("Trick settings");
+            
+            EASY_TRICK_DOWN = commonBuilder
+                .comment("Make trick down easier. (default: false)")
+                .define("easy_trick_down", false);
+        }
+        {
+            commonBuilder.pop()
                 .push("Misc settings");
             
             COLLIDE_ACTION = commonBuilder
@@ -113,6 +130,14 @@ public class TruePowerCommonConfig {
             STEP_WHEN_USING_COMBO = commonBuilder
                 .comment("Move forward while using combo. (default: true)")
                 .define("step_when_using_combo", true);
+            
+            ENABLE_STUN_VALUE = commonBuilder
+                .comment("Enable TruePower's custom stun value system. (default: true)")
+                .define("enable_stun_value", true);
+            
+            POWERFUL_STUN = commonBuilder
+                .comment("Make stun powerful. (default: true)")
+                .define("powerful_stun", true);
         }
         commonBuilder.pop();
         COMMON_CONFIG = commonBuilder.build();

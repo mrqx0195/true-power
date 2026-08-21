@@ -12,8 +12,15 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageSources;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.mrqx.truepower.data.TruePowerDamageTypes;
 
 public class TruePowerAttackManager {
     public static void doVoidSlashAttack(LivingEntity living, double damage) {
@@ -93,56 +100,70 @@ public class TruePowerAttackManager {
     }
     
     public static Vec3 maybeBackOffFromEdge(Vec3 vec, LivingEntity mover) {
-        return maybeBackOffFromEdge(vec, mover, true);
+        return maybeBackOffFromEdge(vec, mover, false);
     }
     
+    /**
+     * @see Player#maybeBackOffFromEdge(Vec3, MoverType)
+     */
     public static Vec3 maybeBackOffFromEdge(Vec3 vec, LivingEntity mover, boolean shouldDownStep) {
         double d0 = vec.x;
         double d1 = vec.z;
         float y = shouldDownStep ? -mover.maxUpStep() : 0;
         
-        while (d0 != 0 && mover.level().noCollision(mover,
-            mover.getBoundingBox().move(d0, y, 0))) {
-            if (d0 < 0.05 && d0 >= -0.05) {
-                d0 = 0;
-            } else if (d0 > 0) {
-                d0 -= 0.05;
-            } else {
-                d0 += 0.05;
+        double d3 = Math.signum(d0) * 0.05;
+        double d4;
+        for (d4 = Math.signum(d1) * 0.05; d0 != 0.0 && canFallAtLeast(mover, d0, 0.0, y); d0 -= d3) {
+            if (Math.abs(d0) <= 0.05) {
+                d0 = 0.0;
+                break;
             }
         }
         
-        while (d1 != 0 && mover.level().noCollision(mover,
-            mover.getBoundingBox().move(0, y, d1))) {
-            if (d1 < 0.05 && d1 >= -0.05) {
-                d1 = 0;
-            } else if (d1 > 0) {
-                d1 -= 0.05;
-            } else {
-                d1 += 0.05;
-            }
-        }
-        
-        while (d0 != 0 && d1 != 0 && mover.level().noCollision(mover,
-            mover.getBoundingBox().move(d0, y, d1))) {
-            if (d0 < 0.05 && d0 >= -0.05) {
-                d0 = 0;
-            } else if (d0 > 0) {
-                d0 -= 0.05;
-            } else {
-                d0 += 0.05;
+        while (d1 != 0.0 && canFallAtLeast(mover, 0.0, d1, y)) {
+            if (Math.abs(d1) <= 0.05) {
+                d1 = 0.0;
+                break;
             }
             
-            if (d1 < 0.05 && d1 >= -0.05) {
-                d1 = 0;
-            } else if (d1 > 0) {
-                d1 -= 0.05;
+            d1 -= d4;
+        }
+        
+        while (d0 != 0.0 && d1 != 0.0 && canFallAtLeast(mover, d0, d1, y)) {
+            if (Math.abs(d0) <= 0.05) {
+                d0 = 0.0;
             } else {
-                d1 += 0.05;
+                d0 -= d3;
+            }
+            
+            if (Math.abs(d1) <= 0.05) {
+                d1 = 0.0;
+            } else {
+                d1 -= d4;
             }
         }
         
         vec = new Vec3(d0, vec.y, d1);
         return vec;
+    }
+    
+    public static boolean canFallAtLeast(Entity mover, double x, double z, float distance) {
+        AABB aabb = mover.getBoundingBox();
+        return mover.level()
+            .noCollision(
+                mover,
+                new AABB(
+                    aabb.minX + x,
+                    aabb.minY - (double) distance - 1.0E-5F,
+                    aabb.minZ + z,
+                    aabb.maxX + x,
+                    aabb.minY,
+                    aabb.maxZ + z
+                )
+            );
+    }
+    
+    public static DamageSource getSummonedSwordDamageSource(DamageSources instance, Entity causingEntity, Entity directEntity) {
+        return new DamageSource(instance.damageTypes.getHolderOrThrow(TruePowerDamageTypes.SUMMONED_SWORD), causingEntity, directEntity);
     }
 }

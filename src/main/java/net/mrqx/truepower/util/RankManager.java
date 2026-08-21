@@ -15,25 +15,25 @@ public class RankManager {
     private static final Map<UUID, LinkedList<Pair<Long, ResourceLocation>>> COMBO_LIST_MAP = new HashMap<>();
     private static final Map<UUID, Long> RANK_COOLDOWN_COUNTER = new HashMap<>();
     
-    public static long getPreAddRank(LivingEntity livingEntity) {
+    public synchronized static long getPreAddRank(LivingEntity livingEntity) {
         if (!PRE_ADD_RANK_MAP.containsKey(livingEntity.getUUID())) {
             PRE_ADD_RANK_MAP.put(livingEntity.getUUID(), 0L);
         }
         return PRE_ADD_RANK_MAP.get(livingEntity.getUUID());
     }
     
-    public static void setPreAddRank(LivingEntity livingEntity, long rank) {
+    public synchronized static void setPreAddRank(LivingEntity livingEntity, long rank) {
         PRE_ADD_RANK_MAP.put(livingEntity.getUUID(), rank);
     }
     
-    public static LinkedList<Pair<Long, ResourceLocation>> getComboList(LivingEntity livingEntity) {
+    public synchronized static LinkedList<Pair<Long, ResourceLocation>> getComboList(LivingEntity livingEntity) {
         if (!COMBO_LIST_MAP.containsKey(livingEntity.getUUID())) {
             COMBO_LIST_MAP.put(livingEntity.getUUID(), new LinkedList<>());
         }
         return COMBO_LIST_MAP.get(livingEntity.getUUID());
     }
     
-    public static boolean checkCombo(LivingEntity livingEntity, ResourceLocation combo, long timeLimit) {
+    public synchronized static boolean checkCombo(LivingEntity livingEntity, ResourceLocation combo, long timeLimit) {
         cleanTimeoutCombo(livingEntity);
         LinkedList<Pair<Long, ResourceLocation>> comboList = getComboList(livingEntity);
         return comboList.stream().anyMatch(entry
@@ -41,7 +41,7 @@ public class RankManager {
             && entry.getFirst() >= livingEntity.level().getGameTime() - timeLimit);
     }
     
-    public static boolean addCombo(LivingEntity livingEntity, ResourceLocation combo) {
+    public synchronized static boolean addCombo(LivingEntity livingEntity, ResourceLocation combo) {
         cleanTimeoutCombo(livingEntity);
         LinkedList<Pair<Long, ResourceLocation>> comboList = getComboList(livingEntity);
         if (checkCombo(livingEntity, combo, TruePowerCommonConfig.COMBO_TIMEOUT_FOR_RANK_INCREASE.get())) {
@@ -51,7 +51,7 @@ public class RankManager {
         return true;
     }
     
-    public static void cleanTimeoutCombo(LivingEntity livingEntity) {
+    public synchronized static void cleanTimeoutCombo(LivingEntity livingEntity) {
         LinkedList<Pair<Long, ResourceLocation>> comboList = getComboList(livingEntity);
         while (!comboList.isEmpty()) {
             Pair<Long, ResourceLocation> entry = comboList.getLast();
@@ -64,14 +64,14 @@ public class RankManager {
         }
     }
     
-    public static long getRankCooldown(LivingEntity livingEntity) {
+    public synchronized static long getRankCooldown(LivingEntity livingEntity) {
         if (!RANK_COOLDOWN_COUNTER.containsKey(livingEntity.getUUID())) {
             RANK_COOLDOWN_COUNTER.put(livingEntity.getUUID(), 0L);
         }
         return RANK_COOLDOWN_COUNTER.get(livingEntity.getUUID());
     }
     
-    public static void setRankCooldown(LivingEntity livingEntity, long cooldown) {
+    public synchronized static void setRankCooldown(LivingEntity livingEntity, long cooldown) {
         RANK_COOLDOWN_COUNTER.put(livingEntity.getUUID(), cooldown);
     }
 }

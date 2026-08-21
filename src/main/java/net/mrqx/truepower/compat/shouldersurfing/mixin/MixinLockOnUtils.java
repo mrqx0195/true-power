@@ -4,6 +4,8 @@ import com.github.exopandora.shouldersurfing.client.ShoulderSurfing;
 import com.github.exopandora.shouldersurfing.client.ShoulderSurfingCamera;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -27,7 +29,7 @@ public abstract class MixinLockOnUtils {
             return original.call(worldIn, entityIn, start, dir, blockReach, entityReach, selector);
         }
     }
-
+    
     @WrapOperation(method = "isVisible(Lnet/minecraft/world/entity/Entity;D)Z", at = @At(value = "INVOKE", target = "Lnet/mrqx/truepower/util/LockOnUtils;isInViewCone(Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/AABB;FF)Z", remap = false), remap = false)
     private static boolean wrapIsInViewCone(Vec3 cameraPos, AABB bb, float pitch, float yaw, Operation<Boolean> original) {
         if (ShoulderSurfing.getInstance().isShoulderSurfing()) {
@@ -35,6 +37,17 @@ public abstract class MixinLockOnUtils {
             return original.call(cameraPos, bb, camera.getXRot(), camera.getYRot());
         } else {
             return original.call(cameraPos, bb, pitch, yaw);
+        }
+    }
+    
+    @WrapOperation(method = "isVisible(Lnet/minecraft/world/entity/Entity;D)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;getPosition()Lnet/minecraft/world/phys/Vec3;"), remap = false)
+    private static Vec3 wrapGetPosition(Camera instance, Operation<Vec3> original) {
+        Minecraft minecraft = Minecraft.getInstance();
+        Entity cameraEntity = minecraft.getCameraEntity();
+        if (ShoulderSurfing.getInstance().isShoulderSurfing() && cameraEntity != null) {
+            return TruePowerShoulderSurfingUtils.getShoulderSurfingCameraPosition(minecraft, cameraEntity);
+        } else {
+            return original.call(instance);
         }
     }
 }
