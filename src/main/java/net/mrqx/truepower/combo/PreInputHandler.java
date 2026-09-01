@@ -33,7 +33,7 @@ public final class PreInputHandler {
         }
         ISlashBladeState state = event.getSlashBladeState();
         Entity entity = event.getEntity();
-        if (state.getLastActionTime() >= entity.level().getGameTime() - 1 || !(entity instanceof LivingEntity livingEntity)) {
+        if (!state.getComboRoot().equals(ComboStateRegistry.STANDBY.getId()) || state.getLastActionTime() >= entity.level().getGameTime() - 1 || !(entity instanceof LivingEntity livingEntity)) {
             return;
         }
         Map.Entry<Integer, ResourceLocation> currentLoc = state.resolvCurrentComboStateTicks(livingEntity);

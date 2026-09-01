@@ -57,4 +57,9 @@ public final class TruePowerComboStateRegistry {
                 .put(0, AttackManager::playQuickSheathSoundAction).build())
             .releaseAction(ComboState::releaseActionQuickCharge)::build);
     
+    public static final DeferredHolder<ComboState, ComboState> STUN = COMBO_STATE.register("stun",
+        ComboState.Builder.newInstance().startAndEnd(0, 1).priority(-100)
+            .next(entity -> TruePowerMod.prefix("stun"))
+            .nextOfTimeout(entity -> TruePowerMod.prefix("stun"))
+            ::build);
 }

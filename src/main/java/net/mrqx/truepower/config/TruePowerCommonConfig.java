@@ -25,6 +25,7 @@ public class TruePowerCommonConfig {
     public static final ModConfigSpec.DoubleValue SUMMONED_SWORD_DAMAGE_MULTIPLIER;
     
     public static final ModConfigSpec.BooleanValue EASY_TRICK_DOWN;
+    public static final ModConfigSpec.BooleanValue REMOVE_ORIGINAL_SSA_INPUT;
     
     public static final ModConfigSpec.EnumValue<CollideAction> COLLIDE_ACTION;
     public static final ModConfigSpec.BooleanValue STEP_WHEN_USING_COMBO;
@@ -96,8 +97,12 @@ public class TruePowerCommonConfig {
                 .define("blade_arts_need_shift", false);
             
             ENABLE_PRE_INPUT = commonBuilder
-                .comment("Enable TruePower's pre-input (or Input Buffering) system . (default: true)")
+                .comment("Enable TruePower's pre-input (or Input Buffering) system. (default: true)")
                 .define("enable_pre_input", true);
+            
+            REMOVE_ORIGINAL_SSA_INPUT = commonBuilder
+                .comment("Remove the original input of Super SlashArts. (default: false)")
+                .define("remove_original_ssa_input", false);
         }
         {
             commonBuilder.pop()

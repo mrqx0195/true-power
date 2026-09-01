@@ -1,5 +1,7 @@
 package net.mrqx.truepower.entity.ai;
 
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
+import mods.flammpfeil.slashblade.registry.ComboStateRegistry;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Mob;
@@ -8,6 +10,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
 import net.mrqx.truepower.attachment.ITruePowerStunData;
 import net.mrqx.truepower.config.TruePowerCommonConfig;
+import net.mrqx.truepower.registry.TruePowerComboStateRegistry;
 
 import java.util.EnumSet;
 
@@ -41,6 +44,8 @@ public class TruePowerStunGoal extends Goal {
                 pathfinderMob.setTarget(null);
             }
         }
+        BladeStateAccess.of(this.entity.getMainHandItem())
+            .ifPresent(state -> state.updateComboSeq(this.entity, TruePowerComboStateRegistry.STUN.getId()));
         ITruePowerStunData data = ITruePowerStunData.get(this.entity);
         data.resetStunValue();
         if (this.entity.level() instanceof ServerLevel serverLevel) {
@@ -62,5 +67,7 @@ public class TruePowerStunGoal extends Goal {
         ITruePowerStunData data = ITruePowerStunData.get(this.entity);
         data.resetStunValue();
         data.setStunEndTick(0);
+        BladeStateAccess.of(this.entity.getMainHandItem())
+            .ifPresent(state -> state.updateComboSeq(this.entity, ComboStateRegistry.NONE.getId()));
     }
 }

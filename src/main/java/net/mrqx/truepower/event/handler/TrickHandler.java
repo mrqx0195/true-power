@@ -23,6 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.mrqx.sbr_core.utils.InputStream;
 import net.mrqx.sbr_core.utils.JustSlashArtManager;
+import net.mrqx.truepower.TruePowerMod;
 import net.mrqx.truepower.attachment.ITruePowerData;
 import net.mrqx.truepower.config.TruePowerCommonConfig;
 import net.mrqx.truepower.mixin.AccessorServerPlayer;
@@ -38,7 +39,8 @@ import java.util.Optional;
 
 @EventBusSubscriber
 public final class TrickHandler {
-    static final int TRICK_UNTOUCHABLE_TIME = 10;
+    public static final String TRICK_BEFORE_POS = TruePowerMod.MODID + ".trick.beforePos";
+    public static final int TRICK_UNTOUCHABLE_TIME = 10;
     
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void trickDown(InputCommandEvent event) {
@@ -94,7 +96,7 @@ public final class TrickHandler {
             return;
         }
         
-        boolean onDown = !old.contains(InputCommand.SPRINT) && current.contains(InputCommand.SPRINT);
+        boolean onDown = !old.contains(InputCommand.SPRINT) && current.contains(InputCommand.SPRINT) && !old.contains(InputCommand.FORWARD);
         if (!onDown) {
             return;
         }

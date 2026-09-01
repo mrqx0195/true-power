@@ -221,6 +221,9 @@ public final class TruePowerComboModifiers {
         builder(ComboStateRegistry.JUDGEMENT_CUT_SLASH_JUST)
             .behavior()
             .build(ENTRIES::add);
+        builder(ComboStateRegistry.JUDGEMENT_CUT_END)
+            .behavior()
+            .build(ENTRIES::add);
         
         builder(ComboStateRegistry.VOID_SLASH)
             .behavior(b -> b

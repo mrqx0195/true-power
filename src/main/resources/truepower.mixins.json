@@ -28,7 +28,8 @@
     "MixinRankPointHandler",
     "MixinSlashArts",
     "MixinSlayerStyleArts",
-    "MixinSummonedSwordArts"
+    "MixinSummonedSwordArts",
+    "MixinSuperSlashArts"
   ],
   "package": "net.mrqx.truepower.mixin",
   "refmap": "truepower.refmap.json",
