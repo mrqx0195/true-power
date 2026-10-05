@@ -14,6 +14,7 @@ import net.mrqx.truepower.attachment.ITruePowerData;
 import net.mrqx.truepower.compat.TruePowerCompatManager;
 import net.mrqx.truepower.network.ComboSyncMessage;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
@@ -22,7 +23,7 @@ import java.util.List;
 
 @EventBusSubscriber(Dist.CLIENT)
 public final class ClientHandler {
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void doClientStuff(FMLClientSetupEvent event) {
         TruePowerCompatManager.clientInit(event);
     }

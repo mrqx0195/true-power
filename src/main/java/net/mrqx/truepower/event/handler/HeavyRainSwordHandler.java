@@ -2,6 +2,7 @@ package net.mrqx.truepower.event.handler;
 
 import mods.flammpfeil.slashblade.SlashBladeConfig;
 import mods.flammpfeil.slashblade.capability.concentrationrank.CapabilityConcentrationRank;
+import mods.flammpfeil.slashblade.capability.concentrationrank.IConcentrationRank;
 import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.capability.slashblade.ISlashBladeState;
 import mods.flammpfeil.slashblade.event.handler.InputCommandEvent;
@@ -62,7 +63,11 @@ public final class HeavyRainSwordHandler {
             return;
         }
         Level worldIn = entity.level();
-        int rank = entity.getData(CapabilityConcentrationRank.RANK_POINT).getRank(worldIn.getGameTime()).level;
+        IConcentrationRank.ConcentrationRanks ranks = entity.getData(CapabilityConcentrationRank.RANK_POINT).getRank(worldIn.getGameTime());
+        if (ranks == null) {
+            return;
+        }
+        int rank = ranks.level;
         int count = 9 + Math.min(rank - 1, 0);
         
         Entity target = bladeState.getTargetEntity(worldIn);

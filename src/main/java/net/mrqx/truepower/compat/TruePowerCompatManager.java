@@ -23,12 +23,12 @@ public final class TruePowerCompatManager {
     public static final boolean EPIC_FIGHT = LoadingModList.get().getModFileById(EpicFight.MODID) != null;
     
     public static void clientInit(FMLClientSetupEvent event) {
-        if (PLAYER_ANIMATOR) {
-            PlayerAnimationRegistryHandler.getInstance().register();
-        }
     }
     
     public static void commonInit(FMLCommonSetupEvent event) {
+        if (PLAYER_ANIMATOR) {
+            PlayerAnimationRegistryHandler.getInstance().register();
+        }
         if (EPIC_FIGHT) {
             TruePowerEpicFight.commonInit(event);
         }

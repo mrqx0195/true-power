@@ -39,13 +39,18 @@ public final class PoweredBonusHandler {
         
         IConcentrationRank rank = livingEntity.getData(CapabilityConcentrationRank.RANK_POINT);
         double amount;
-        if (rank.getRank(livingEntity.level().getGameTime()).level > IConcentrationRank.ConcentrationRanks.SS.level) {
+        IConcentrationRank.ConcentrationRanks ranks = rank.getRank(livingEntity.level().getGameTime());
+        if (ranks == null) {
+            return;
+        }
+        
+        if (ranks.level > IConcentrationRank.ConcentrationRanks.SS.level) {
             if (isPowered) {
                 amount = 1.4;
             } else {
                 amount = 1.25;
             }
-        } else if (rank.getRank(livingEntity.level().getGameTime()).level < IConcentrationRank.ConcentrationRanks.C.level) {
+        } else if (ranks.level < IConcentrationRank.ConcentrationRanks.C.level) {
             if (isPowered) {
                 amount = 0.75;
             } else {
